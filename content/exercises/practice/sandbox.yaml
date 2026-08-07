@@ -1,0 +1,19 @@
+id: practice/sandbox
+title: Free Practice Sandbox
+mission: |
+  A safe place to try anything. This terminal is a **simulation** — nothing
+  you type here touches a real machine, so experiment freely. Type `help`
+  to see what's available. `reset` (button above) restores this starting
+  state whenever you want a clean slate.
+concepts: []
+cwd: /home/learner
+initial_files:
+  /home/learner/notes.txt:
+    content: |
+      Welcome to the sandbox.
+      Try: ls -l, cat notes.txt, mkdir lab, echo hello > lab/hello.txt
+  /home/learner/docs: null
+  /home/learner/docs/readme.md:
+    content: "Sandbox docs directory. Practice cp, mv, rm here."
+goal: []
+hints: []

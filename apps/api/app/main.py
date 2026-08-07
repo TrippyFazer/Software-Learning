@@ -90,8 +90,10 @@ def health():
 
 app.include_router(auth_router, prefix="/api")
 
-# Routers added by later phases (content, learning, simterm) are mounted here
-# as they come online.
 from app.modules.content.router import router as content_router  # noqa: E402
+from app.modules.learning.router import router as learning_router  # noqa: E402
+from app.modules.simterm.router import router as simterm_router  # noqa: E402
 
 app.include_router(content_router, prefix="/api")
+app.include_router(learning_router, prefix="/api")
+app.include_router(simterm_router, prefix="/api")

@@ -1,0 +1,35 @@
+id: linux/create-project-structure
+title: "Mission: Build a Project Skeleton"
+mission: |
+  Every project you'll ever build starts the same way: a directory structure.
+  Create this one, any way you like:
+
+  ```
+  projects/
+  projects/brain-core/
+  projects/brain-core/README.md
+  ```
+
+  You're graded on the **resulting state**, not the exact commands — any
+  valid route works. When all three checks turn green, you're done.
+concepts:
+  - filesystem
+  - path
+  - directory
+  - working-directory
+cwd: /home/learner
+initial_files: {}
+goal:
+  - type: dir_exists
+    path: /home/learner/projects
+    description: "projects/ directory exists in your home directory"
+  - type: dir_exists
+    path: /home/learner/projects/brain-core
+    description: "brain-core/ directory exists inside projects/"
+  - type: file_exists
+    path: /home/learner/projects/brain-core/README.md
+    description: "README.md file exists inside brain-core/"
+hints:
+  - "mkdir creates a directory; ls shows you what's here; pwd shows where you are."
+  - "You can work from home: mkdir projects, then cd projects, then keep going. Or study mkdir -p."
+  - "Files are created with touch <name>. Make sure you're in (or pointing at) the right directory — pwd is your friend."

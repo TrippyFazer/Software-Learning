@@ -126,6 +126,11 @@ class VfsFileSpec(BaseModel):
     content: str = ""
     mode: str = "644"                # octal string; dirs default to 755
     owner: str = "learner"
+    # "Scripts": when the file is executed (./name, requires the x bit) the
+    # simulator prints exec_output and creates exec_creates files. This powers
+    # failure-driven lessons — no real execution is ever involved.
+    exec_output: str | None = None
+    exec_creates: dict[str, str] = {}
 
 
 class Exercise(BaseModel):
@@ -138,7 +143,8 @@ class Exercise(BaseModel):
     cwd: str = "/home/learner"
     # path -> spec for files, path -> None (i.e. {}) for directories
     initial_files: dict[str, VfsFileSpec | None] = {}
-    goal: list[GoalCheck]
+    # Empty goal list = free-play sandbox (never "completes").
+    goal: list[GoalCheck] = []
     hints: list[str] = []            # revealed one at a time on request
 
 

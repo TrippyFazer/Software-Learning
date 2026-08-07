@@ -1,0 +1,12 @@
+id: systems
+number: 0
+stage: 1
+title: Computing Systems Mental Model
+description: >
+  Before any commands or code: what a computer system actually is. Servers,
+  clients, processes, services, and how a web application like this one is
+  layered — hardware to OS to backend to frontend.
+lessons:
+  - what-is-a-server
+  - anatomy-of-an-application
+implemented: true

@@ -1,0 +1,60 @@
+# Module 0 flashcards
+- slug: card-server
+  front: Server
+  back: A computer or program that answers requests. Three senses — hardware, software, role — always identify which.
+  concepts: [server]
+  module: systems
+
+- slug: card-client
+  front: Client
+  back: The asking side of an exchange. Runs on hardware you don't control — never trust it to enforce rules.
+  concepts: [client]
+  module: systems
+
+- slug: card-host
+  front: Host
+  back: Any machine connected to a network. "The host" here = the Lightsail Ubuntu machine.
+  concepts: [host]
+  module: systems
+
+- slug: card-operating-system
+  front: Operating System
+  back: The layer that shares hardware among processes and enforces permissions. Programs ask; the OS acts.
+  concepts: [operating-system]
+  module: systems
+
+- slug: card-process
+  front: Process
+  back: One running program, with its own memory and permissions, as the OS sees it.
+  concepts: [process]
+  module: systems
+
+- slug: card-service
+  front: Service
+  back: A process meant to run continuously — start on boot, restart on failure.
+  concepts: [service]
+  module: systems
+
+- slug: card-backend
+  front: Backend
+  back: Server-side code — the kitchen. The only place real rules and secrets can live.
+  concepts: [backend]
+  module: systems
+
+- slug: card-frontend
+  front: Frontend
+  back: Code that runs on the user's device — the dining room. Inspectable and alterable by the user.
+  concepts: [frontend]
+  module: systems
+
+- slug: card-database
+  front: Database
+  back: The durable-state service. Logic lives in processes; state lives here and survives restarts.
+  concepts: [database]
+  module: systems
+
+- slug: card-api
+  front: API
+  back: The agreed contract (URLs + payload shapes) through which programs talk without knowing each other's internals.
+  concepts: [api]
+  module: systems

@@ -1,0 +1,72 @@
+id: systems/anatomy-of-an-application
+questions:
+  - id: sys-anatomy-q1
+    type: multiple_choice
+    concepts: [frontend, backend]
+    prompt: Why must quiz grading in this Lab happen in the backend rather than the frontend?
+    options:
+      - The backend has a faster CPU
+      - JavaScript cannot compare answers
+      - The frontend runs on the user's machine, so anything it holds or enforces can be inspected and altered
+      - Browsers block grading logic for security reasons
+    answer_index: 2
+    explanation: >
+      The frontend executes on hardware the user controls. Shipping answers
+      or enforcement to it means shipping them to the user. Real rules live
+      behind the API, in the backend.
+
+  - id: sys-anatomy-q2
+    type: multiple_choice
+    concepts: [process, service]
+    prompt: Which of these is a service, in the precise sense used in this lesson?
+    options:
+      - A script you run once to rename a folder of files
+      - The PostgreSQL process, started at boot and restarted automatically if it crashes
+      - A YAML file describing the curriculum
+      - The CSS that styles this page
+    answer_index: 1
+    explanation: >
+      A service is a process with a "run forever, restart on failure" job
+      description. The one-off script is a process while it runs, but
+      nothing supervises it. Files aren't processes at all.
+
+  - id: sys-anatomy-q3
+    type: multiple_choice
+    concepts: [api]
+    prompt: The API between this Lab's frontend and backend is best described as…
+    options:
+      - A third program running between the two
+      - The database table where requests are stored
+      - The agreed contract of URLs and JSON shapes the two sides use to talk
+      - The Python source code of the backend
+    answer_index: 2
+    explanation: >
+      An API is a contract, not a process. Either side can be rewritten
+      freely as long as the contract — endpoints and payload shapes — is
+      honored.
+
+  - id: sys-anatomy-q4
+    type: multiple_choice
+    concepts: [database, backend]
+    prompt: Every process on the host restarts. Your quiz history survives. Why?
+    options:
+      - The frontend keeps a copy in the browser
+      - State lives in the database's durable storage, not in any process's memory
+      - Python automatically remembers variables across restarts
+      - Caddy caches all answers
+    answer_index: 1
+    explanation: >
+      Process memory vanishes at restart. Durability is the database's
+      whole job: it writes state to disk with care. Logic in processes,
+      state in the database.
+
+  - id: sys-anatomy-q5
+    type: text
+    concepts: [backend, frontend]
+    prompt: >
+      One word — in this Lab's stack, does the React code run on the host
+      or in your browser? (answer: host or browser)
+    accept: ["browser", "the browser"]
+    explanation: >
+      The host *serves* the React bundle as files; your browser downloads
+      and executes it. That's precisely why it's untrusted.

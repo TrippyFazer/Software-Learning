@@ -1,0 +1,104 @@
+# Module 0 — Computing Systems Mental Model
+- slug: server
+  term: Server
+  mental_model: A computer — or a program — whose job is to answer requests from other computers.
+  technical: >
+    Context-dependent term for (1) a machine provisioned to run services,
+    (2) a program that listens for and responds to network requests, or
+    (3) the answering role in a client–server protocol exchange.
+  why_it_matters: Everything you build (Brain Core, Plex, this Lab) is one; you must hear which sense a sentence uses.
+  related: [client, host, service]
+  module: systems
+
+- slug: client
+  term: Client
+  mental_model: The computer or program that asks — your browser, your phone's Plex app.
+  technical: The initiating role in a client–server exchange; it opens the connection and sends requests.
+  why_it_matters: Client code runs on hardware you don't control, which makes it untrustworthy for enforcing rules.
+  related: [server, frontend]
+  module: systems
+
+- slug: host
+  term: Host
+  mental_model: Any machine connected to a network.
+  technical: A device with a network address; "the host" in this Lab means the Lightsail Ubuntu machine.
+  why_it_matters: Rented "servers" are hosts you administer remotely; the word appears in every networking doc.
+  related: [server, operating-system]
+  module: systems
+
+- slug: hardware
+  term: Hardware
+  mental_model: The physical parts — CPU, RAM, disks, network card.
+  technical: The physical computing resources an operating system manages and allocates to processes.
+  why_it_matters: Hardware sets the hard limits (memory, speed, storage) your software lives within.
+  related: [operating-system, host]
+  module: systems
+
+- slug: operating-system
+  term: Operating System (OS)
+  mental_model: The layer that manages the hardware and runs all the programs.
+  technical: >
+    Software that multiplexes CPU and memory among processes, mediates all
+    hardware access, and enforces permissions. This Lab runs on Ubuntu Linux.
+  why_it_matters: Every "Permission denied" and every service that starts on boot is the OS doing its job.
+  related: [process, hardware]
+  module: systems
+
+- slug: process
+  term: Process
+  mental_model: One running program.
+  technical: An OS-managed instance of an executing program with its own memory space and permissions.
+  why_it_matters: Grand architectures collapse into a list of processes; ps and logs are how you see them.
+  related: [service, operating-system]
+  module: systems
+
+- slug: service
+  term: Service
+  mental_model: A background program meant to run continuously.
+  technical: A process managed to start on boot, run unattended, and restart on failure (e.g. via systemd or Docker).
+  why_it_matters: Servers are made of services; "is the service running?" is diagnosis question #1.
+  related: [process, server]
+  module: systems
+
+- slug: application
+  term: Application
+  mental_model: The whole assembled product a user experiences.
+  technical: The combination of frontend, backend, and data services delivering one coherent function.
+  why_it_matters: Keeps you thinking about the assembled system, not just its parts.
+  related: [frontend, backend, database]
+  module: systems
+
+- slug: frontend
+  term: Frontend
+  mental_model: The part of an application that runs on the user's device — the dining room.
+  technical: "Client-side code (here: TypeScript/React) delivered to and executed by the browser."
+  why_it_matters: It can be inspected and altered by users, so it can never enforce real rules.
+  related: [backend, client, api]
+  module: systems
+
+- slug: backend
+  term: Backend
+  mental_model: The part that runs on your server — the kitchen.
+  technical: "Server-side code (here: Python/FastAPI) that implements logic, enforces rules, and owns secrets."
+  why_it_matters: It is the only part you fully control; all real enforcement lives here.
+  related: [frontend, api, database]
+  module: systems
+
+- slug: database
+  term: Database
+  mental_model: The pantry — where data is kept so it survives restarts.
+  technical: "A dedicated service (here: PostgreSQL) providing durable, consistent, queryable storage."
+  why_it_matters: Logic lives in processes, state lives here; confusing the two loses data.
+  related: [backend, service]
+  module: systems
+
+- slug: api
+  term: API
+  mental_model: The menu and order slip — an agreed way for programs to ask each other for things.
+  technical: >
+    Application Programming Interface: the defined set of requests (here, URLs
+    under /api/*) and response shapes through which programs interact without
+    knowing each other's internals.
+  why_it_matters: Every frontend↔backend interaction crosses one; designing them well is a core skill (Module 11).
+  related: [frontend, backend]
+  module: systems

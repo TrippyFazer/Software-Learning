@@ -1,0 +1,79 @@
+id: systems/what-is-a-server
+questions:
+  - id: sys-server-q1
+    type: multiple_choice
+    concepts: [server, client]
+    prompt: >
+      Your browser loads a page from learn.example.com. In this exchange,
+      which statement is accurate?
+    options:
+      - Your browser is the server, because it does the rendering work
+      - Your browser is the client; the machine answering is playing the server role
+      - Both are servers, because both are computers
+      - Neither — only rack-mounted hardware can be a server
+    answer_index: 1
+    explanation: >
+      Server and client are roles in an exchange: the asker is the client,
+      the answerer the server. Rendering effort doesn't change who asked.
+      Any computer can play either role — server-ness is not a property of
+      the metal.
+
+  - id: sys-server-q2
+    type: multiple_choice
+    concepts: [server]
+    prompt: >
+      A colleague says "the server crashed," then later "we should upgrade
+      the server to 32 GB of RAM." Which senses of "server" are these?
+    options:
+      - Both refer to hardware
+      - Both refer to software
+      - First software (or role), second hardware
+      - First hardware, second software
+    answer_index: 2
+    explanation: >
+      A crash is something a running program (or OS) does — the software
+      sense. RAM is physical — the hardware sense. Hearing the switch is
+      exactly the skill this lesson builds.
+
+  - id: sys-server-q3
+    type: multiple_choice
+    concepts: [operating-system, hardware]
+    prompt: What does the operating system actually do for a program that wants to send data over the network?
+    options:
+      - Nothing — programs control the network card directly
+      - It mediates the access — the program asks the OS, which drives the hardware
+      - It forwards the request to the frontend
+      - It stores the data in the database first
+    answer_index: 1
+    explanation: >
+      Programs never touch hardware directly on a modern OS. They make
+      requests (system calls); the OS drives the hardware and enforces
+      permissions. That mediation is also why the OS can say no —
+      "Permission denied."
+
+  - id: sys-server-q4
+    type: multiple_choice
+    concepts: [host]
+    prompt: In this Lab's documentation, "the host" refers to…
+    options:
+      - Your own laptop
+      - The rented Ubuntu machine on AWS Lightsail that runs the Lab
+      - The Caddy program
+      - The person who owns the domain
+    answer_index: 1
+    explanation: >
+      A host is any machine on a network; in these docs "the host" always
+      means the Lightsail Ubuntu machine. Caddy is a server *program*
+      running on that host.
+
+  - id: sys-server-q5
+    type: text
+    concepts: [server, hardware]
+    prompt: >
+      True or false — "You must buy dedicated hardware before you can build
+      and run server software." (answer: true or false)
+    accept: ["false", "f"]
+    explanation: >
+      Server-ness is a role. The same backend you'll build for Brain Core can
+      run on your laptop during development and move to rented or owned
+      hardware later — the code doesn't change.

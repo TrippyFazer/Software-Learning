@@ -38,7 +38,9 @@ def submit_answer(body: AnswerIn, user: CurrentUser, db: Annotated[Session, Depe
 # --- lesson progress ---------------------------------------------------------
 
 @router.post("/lessons/{module}/{lesson}/start")
-def start_lesson(module: str, lesson: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+def start_lesson(
+    module: str, lesson: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+):
     slug = f"{module}/{lesson}"
     if slug not in get_content_index().lessons:
         raise HTTPException(404, "Lesson not found")
@@ -47,7 +49,9 @@ def start_lesson(module: str, lesson: str, user: CurrentUser, db: Annotated[Sess
 
 
 @router.post("/lessons/{module}/{lesson}/complete")
-def complete_lesson(module: str, lesson: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+def complete_lesson(
+    module: str, lesson: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+):
     slug = f"{module}/{lesson}"
     try:
         service.complete_lesson(db, user.id, slug)

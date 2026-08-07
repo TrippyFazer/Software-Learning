@@ -56,7 +56,9 @@ class Attempt(Base):
     payload: Mapped[dict] = mapped_column(JSON, default=dict)
     correct: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     score: Mapped[float | None] = mapped_column(Float, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, index=True
+    )
 
 
 class MasteryRecord(Base):
@@ -101,7 +103,9 @@ class FlashcardState(Base):
     box: Mapped[int] = mapped_column(Integer, default=0)  # 0..4, higher = better known
     times_seen: Mapped[int] = mapped_column(Integer, default=0)
     times_correct: Mapped[int] = mapped_column(Integer, default=0)
-    last_reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_reviewed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     next_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 

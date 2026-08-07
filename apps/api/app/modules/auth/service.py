@@ -62,6 +62,10 @@ def login(db: Session, email: str, password: str) -> tuple[User, str]:
 
     if not ok or user is None:
         db.add(LoginAttempt(email=email))
+        # Commit HERE, not at request teardown: the 401 this raises would
+        # otherwise roll the transaction back and erase the failure record,
+        # quietly disabling rate limiting. (Found by the lockout test.)
+        db.commit()
         logger.warning("login failed", extra={"event": "login_failed"})
         raise LoginRejected()
 

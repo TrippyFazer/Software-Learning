@@ -238,7 +238,7 @@ def due_flashcards(db: Session, user_id: int) -> list[str]:
     }
     now = utcnow()
     due: list[str] = []
-    for slug, card in idx.flashcards.items():
+    for slug in idx.flashcards:
         state = states.get(slug)
         if state is None:
             # unseen: only surface once its lesson has been completed

@@ -22,7 +22,11 @@ export default function Terminal({
   if (lastClear >= 0) entries = entries.slice(lastClear + 1);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
+    const el = scrollRef.current;
+    // feature-detect: jsdom (tests) has no scrollTo
+    if (el && typeof el.scrollTo === "function") {
+      el.scrollTo({ top: el.scrollHeight });
+    }
   }, [state.transcript.length]);
 
   function submit(e: React.FormEvent) {

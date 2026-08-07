@@ -69,8 +69,7 @@ def _split_frontmatter(path: Path) -> tuple[dict, str]:
     text = path.read_text(encoding="utf-8")
     if not text.startswith("---"):
         raise ContentError(f"{path}: missing YAML frontmatter (file must start with ---)")
-    parts = text.split("\n---", 2)
-    # parts[0] == '---' prefix chunk; find the closing fence
+    # find the closing fence after the opening '---'
     end = text.find("\n---", 3)
     if end == -1:
         raise ContentError(f"{path}: unterminated frontmatter (no closing ---)")

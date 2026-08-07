@@ -148,17 +148,24 @@ def _reset(db: Session, user: CurrentUser, kind: str, slug: str) -> TermState:
 # --- exercises ---------------------------------------------------------------
 
 @router.post("/exercises/{module}/{name}/start", response_model=TermState)
-def start_exercise(module: str, name: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+def start_exercise(
+    module: str, name: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+):
     return _start(db, user, "exercise", f"{module}/{name}")
 
 
 @router.post("/exercises/{module}/{name}/input", response_model=TermState)
-def exercise_input(module: str, name: str, body: InputIn, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+def exercise_input(
+    module: str, name: str, body: InputIn, user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+):
     return _input(db, user, "exercise", f"{module}/{name}", body.line)
 
 
 @router.post("/exercises/{module}/{name}/reset", response_model=TermState)
-def reset_exercise(module: str, name: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+def reset_exercise(
+    module: str, name: str, user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+):
     return _reset(db, user, "exercise", f"{module}/{name}")
 
 
@@ -170,7 +177,9 @@ def start_challenge(name: str, user: CurrentUser, db: Annotated[Session, Depends
 
 
 @router.post("/challenges/{name}/input", response_model=TermState)
-def challenge_input(name: str, body: InputIn, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+def challenge_input(
+    name: str, body: InputIn, user: CurrentUser, db: Annotated[Session, Depends(get_db)]
+):
     return _input(db, user, "challenge", name, body.line)
 
 

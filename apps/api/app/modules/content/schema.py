@@ -78,7 +78,9 @@ class QuizQuestion(BaseModel):
     def _check_shape(self) -> "QuizQuestion":
         if self.type == "multiple_choice":
             if not self.options or self.answer_index is None:
-                raise ValueError(f"question {self.id}: multiple_choice needs options and answer_index")
+                raise ValueError(
+                    f"question {self.id}: multiple_choice needs options and answer_index"
+                )
             if not (0 <= self.answer_index < len(self.options)):
                 raise ValueError(f"question {self.id}: answer_index out of range")
         if self.type == "text" and not self.accept:

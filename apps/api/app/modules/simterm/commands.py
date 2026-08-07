@@ -19,7 +19,7 @@ for execution only.
 
 import shlex
 
-from app.modules.simterm.vfs import HOME, USERNAME, VfsError, VirtualFileSystem
+from app.modules.simterm.vfs import USERNAME, VfsError, VirtualFileSystem
 
 MAX_LINE_LENGTH = 500
 MAX_TOKENS = 50
@@ -59,7 +59,10 @@ def run_line(vfs: VirtualFileSystem, line: str) -> list[str]:
                 commands.append((joiner, current))
             current, joiner = [], tok
         elif tok in ("&", "|", "||", ";;"):
-            return [f"unsupported operator '{tok}' — the simulator keeps to ; and && (lessons explain the rest)"]
+            return [
+                f"unsupported operator '{tok}' — the simulator keeps to ; and && "
+                "(lessons explain the rest)"
+            ]
         else:
             current.append(tok)
     if current:
@@ -231,7 +234,11 @@ def _rm(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
 
 def _chmod(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
     _, rest = _split_flags([a for a in args if not (a.startswith("+") or a.startswith("-"))])
-    symbolic = [a for a in args if a.startswith("+") or (a.startswith("-") and not a[1:].isdigit() and len(a) > 1 and a[1] in "rwx")]
+    symbolic = [
+        a for a in args
+        if a.startswith("+")
+        or (a.startswith("-") and not a[1:].isdigit() and len(a) > 1 and a[1] in "rwx")
+    ]
     numeric = [a for a in rest if a.isdigit()]
     paths = [a for a in rest if not a.isdigit()]
 
@@ -240,7 +247,9 @@ def _chmod(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
     for p in paths:
         node = vfs.get(p)
         if node is None:
-            return CommandResult([f"chmod: cannot access '{p}': No such file or directory"], ok=False)
+            return CommandResult(
+                [f"chmod: cannot access '{p}': No such file or directory"], ok=False
+            )
         if numeric:
             mode = numeric[0]
             if len(mode) != 3 or any(c not in "01234567" for c in mode):

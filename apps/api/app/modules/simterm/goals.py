@@ -24,7 +24,10 @@ def check_goal(vfs: VirtualFileSystem, goal: GoalCheck) -> bool:
         case "cwd_is":
             return vfs.cwd == vfs.resolve(goal.path)
         case "mode_is":
-            return node is not None and node["mode"].rjust(3, "0") == (goal.mode or "").rjust(3, "0")
+            return (
+                node is not None
+                and node["mode"].rjust(3, "0") == (goal.mode or "").rjust(3, "0")
+            )
     return False
 
 

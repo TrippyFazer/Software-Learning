@@ -43,7 +43,7 @@ def get_sessionmaker() -> sessionmaker[Session]:
     return _SessionLocal
 
 
-def get_db() -> Generator[Session, None, None]:
+def get_db() -> Generator[Session]:
     """FastAPI dependency: one database session per request, always closed."""
     db = get_sessionmaker()()
     try:

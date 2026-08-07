@@ -1,0 +1,84 @@
+# Module 2 flashcards
+- slug: card-ip
+  front: IP address
+  back: "A computer's network address (IPv4: four numbers, e.g. 203.0.113.7). With a port, it names one endpoint."
+  concepts: [ip-address]
+  module: networking
+
+- slug: card-lan-wan
+  front: LAN vs WAN
+  back: "LAN: your private local network. WAN: the internet beyond your router. The router bridges and translates (NAT)."
+  concepts: [lan, wan]
+  module: networking
+
+- slug: card-router
+  front: Router / NAT
+  back: "Gateway between LAN and WAN; rewrites many private addresses onto its one public address, and maps replies back."
+  concepts: [router]
+  module: networking
+
+- slug: card-public-private
+  front: "192.168.x.x means…"
+  back: "A private address — reused in every LAN, unroutable on the internet. Sharing it externally is meaningless."
+  concepts: [public-private-ip]
+  module: networking
+
+- slug: card-dns
+  front: DNS
+  back: "Distributed name→address lookup with delegated authority and TTL-based caching. Resolving ≠ reachable."
+  concepts: [dns]
+  module: networking
+
+- slug: card-domain
+  front: Domain & subdomain
+  back: "example.com is leased; learn.example.com, brain.example.com are free structure under it — each just a DNS record."
+  concepts: [domain]
+  module: networking
+
+- slug: card-a-record
+  front: A record
+  back: "'name → IPv4 address' — the DNS record that points learn.example.com at your server."
+  concepts: [dns, domain]
+  module: networking
+
+- slug: card-port
+  front: "Well-known ports"
+  back: "22 SSH · 80 HTTP · 443 HTTPS · 5432 PostgreSQL. Conventions everyone reads fluently."
+  concepts: [port]
+  module: networking
+
+- slug: card-tcp
+  front: "refused vs timeout"
+  back: "Refused: host up, nothing listening on that port. Timeout: silence — dead host or firewall drop. Different suspects."
+  concepts: [tcp]
+  module: networking
+
+- slug: card-http
+  front: HTTP status classes
+  back: "2xx success · 3xx redirect · 4xx client's mistake (404, 401) · 5xx server broke (500 bug, 502 backend unreachable)."
+  concepts: [http]
+  module: networking
+
+- slug: card-https
+  front: HTTPS / TLS
+  back: "HTTP inside TLS: encrypted, tamper-proof, certificate proves the server's name. Secures the pipe, not the site's honesty."
+  concepts: [https]
+  module: networking
+
+- slug: card-firewall
+  front: Firewall
+  back: "Allow-list for ports/sources; everything else is DROPPED silently (looks like a timeout). This host: 22, 80, 443 only."
+  concepts: [firewall]
+  module: networking
+
+- slug: card-reverse-proxy
+  front: Reverse proxy
+  back: "One hardened front door (Caddy): terminates TLS, sets headers, routes /api/* inward. Backends never face the internet."
+  concepts: [reverse-proxy]
+  module: networking
+
+- slug: card-bandwidth-latency
+  front: Bandwidth vs latency
+  back: "Width vs length of the pipe. Big transfers feel bandwidth; every click feels latency. Different fixes."
+  concepts: [bandwidth-latency]
+  module: networking

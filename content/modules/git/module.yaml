@@ -1,0 +1,8 @@
+id: git
+number: 9
+stage: 3
+title: Git and GitHub
+description: >
+  Version control as a lab notebook for code: commits, branches, merges, and collaboration.
+lessons: []
+implemented: false

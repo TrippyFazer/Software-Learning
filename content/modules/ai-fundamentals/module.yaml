@@ -1,0 +1,8 @@
+id: ai-fundamentals
+number: 15
+stage: 4
+title: AI Fundamentals
+description: >
+  Models, tokens, context windows, and what LLMs actually do.
+lessons: []
+implemented: false

@@ -1,0 +1,8 @@
+id: architecture
+number: 10
+stage: 3
+title: Software Architecture
+description: >
+  Modules, boundaries, and trade-offs — including the modular monolith you are using right now.
+lessons: []
+implemented: false

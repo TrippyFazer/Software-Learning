@@ -1,0 +1,8 @@
+id: rag
+number: 17
+stage: 4
+title: RAG
+description: >
+  Retrieval-augmented generation: grounding model answers in your own documents.
+lessons: []
+implemented: false

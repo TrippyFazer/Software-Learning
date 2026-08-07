@@ -1,0 +1,8 @@
+id: observability
+number: 26
+stage: 5
+title: Observability
+description: >
+  Logs, metrics, health checks — seeing inside running systems.
+lessons: []
+implemented: false

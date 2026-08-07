@@ -1,0 +1,8 @@
+id: braincore-domain
+number: 13
+stage: 4
+title: Brain Core Domain Model
+description: >
+  The entities and relationships of the system you're actually building.
+lessons: []
+implemented: false

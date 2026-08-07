@@ -1,0 +1,139 @@
+id: server-rookie
+title: "SERVER ROOKIE: The Web App Is Down"
+stage: 1
+briefing: |
+  **02:47.** Monitoring says the company web application stopped answering.
+  You've been given a shell on the server. Nobody is awake to help you.
+
+  What you know:
+
+  - The application lives somewhere under `/var/www`.
+  - A colleague captured some diagnostics before going to bed —
+    they left a file in your home directory.
+  - Logs are where logs always are.
+
+  Diagnose the failure, fix it, and bring the application back up.
+  Nobody will tell you which commands or concepts you need —
+  combining what you've learned **is** the challenge.
+
+  When you believe you understand what happened, answer the diagnosis
+  questions below. The challenge completes when the app is fixed AND the
+  diagnosis is right.
+concepts:
+  - permission
+  - execute-bit
+  - log
+  - process-management
+  - working-directory
+cwd: /home/learner
+initial_files:
+  /home/learner/diagnostics.txt:
+    content: |
+      === captured 02:31 by fatima before handoff ===
+      $ ps aux | grep webapp
+      (no output — process not running)
+
+      $ df -h /
+      Filesystem      Size  Used Avail Use%
+      /dev/root        40G   12G   28G  30%
+
+      Disk is fine. Process is gone. It was running yesterday.
+      Config was "tidied up" by an intern yesterday afternoon.
+      Good luck. — F.
+  /var/log: null
+  /var/log/webapp.log:
+    content: |
+      2026-08-06 09:00:01 INFO  webapp starting, version 4.1.0
+      2026-08-06 09:00:01 INFO  configuration loaded from /var/www/app/config.yaml
+      2026-08-06 09:00:02 INFO  listening on port 8080
+      2026-08-06 16:22:10 INFO  clean shutdown requested (deploy)
+      2026-08-06 16:22:41 INFO  webapp starting, version 4.1.1
+      2026-08-06 16:22:41 ERROR cannot read /var/www/app/config.yaml: Permission denied
+      2026-08-06 16:22:41 FATAL configuration unreadable, exiting
+      2026-08-06 16:22:41 INFO  webapp stopped
+  /var/www/app: null
+  /var/www/app/config.yaml:
+    content: |
+      # webapp configuration
+      port: 8080
+      database_host: localhost
+      database_port: 5432
+    mode: "000"
+  /var/www/app/restart.sh:
+    content: |
+      #!/bin/bash
+      # Restarts the webapp service.
+      echo "restarting webapp..."
+    mode: "644"
+    exec_output: |
+      webapp starting, version 4.1.1
+      configuration loaded from /var/www/app/config.yaml
+      listening on port 8080
+      PID written to /var/run/webapp.pid
+    exec_creates:
+      /var/run/webapp.pid: "4217"
+  /var/www/app/static: null
+  /var/www/app/static/index.html:
+    content: "<html>(the app's frontend — not your problem tonight)</html>"
+questions:
+  - id: rookie-q1
+    type: multiple_choice
+    concepts: [log, permission]
+    prompt: "What was the root cause of the outage?"
+    options:
+      - The disk filled up
+      - The database went down
+      - The app's config file was made unreadable (permissions), so the 16:22 restart died on startup
+      - Port 8080 was taken by another process
+    answer_index: 2
+    explanation: >
+      The log's FATAL line names it: cannot read config.yaml, Permission
+      denied — right after yesterday's "tidying". Disk and DB were fine
+      (diagnostics + log). The app has been down since 16:22, discovered
+      at 02:47 — outages are often older than their alerts.
+  - id: rookie-q2
+    type: multiple_choice
+    concepts: [permission]
+    prompt: "Which command showed you the config file's broken permissions?"
+    options:
+      - "cat /var/log/webapp.log"
+      - "ls -l /var/www/app"
+      - "pwd"
+      - "whoami"
+    answer_index: 1
+    explanation: >
+      The log told you WHERE to look; ls -l showed the evidence:
+      ---------- (mode 000) on config.yaml. Logs point, ls -l confirms.
+  - id: rookie-q3
+    type: text
+    concepts: [log]
+    prompt: "According to the log and config, which port does webapp serve on? (number)"
+    accept: ["8080"]
+    explanation: "Both the log ('listening on port 8080') and config.yaml agree. Reading two sources beats guessing from one."
+  - id: rookie-q4
+    type: multiple_choice
+    concepts: [execute-bit]
+    prompt: "When you first tried ./restart.sh, what happened and why?"
+    options:
+      - It worked immediately
+      - "Permission denied — restart.sh (mode 644) lacked the execute bit until you added it"
+      - It deleted the config
+      - Command not found
+    answer_index: 1
+    explanation: >
+      Two separate permission problems in one incident: a file that
+      couldn't be READ (config, needed 644) and a script that couldn't be
+      RUN (restart.sh, needed +x). Different bits, same system.
+goal:
+  - type: mode_is
+    path: /var/www/app/config.yaml
+    mode: "644"
+    description: "config.yaml is readable again (mode 644)"
+  - type: file_exists
+    path: /var/run/webapp.pid
+    description: "webapp has been restarted (PID file exists)"
+success_text: >
+  Application restored at 02:58. Root cause identified, fix applied,
+  service verified — that's the whole job. You combined logs, permissions,
+  the execute bit, and filesystem navigation without being told which to
+  use. Welcome past rookie.

@@ -1,0 +1,8 @@
+id: cloud
+number: 23
+stage: 5
+title: Cloud Computing
+description: >
+  What you're actually renting: instances, storage, networks, and bills.
+lessons: []
+implemented: false

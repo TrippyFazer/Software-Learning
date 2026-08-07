@@ -1,0 +1,8 @@
+id: local-ai
+number: 27
+stage: 5
+title: Local AI and GPU Compute
+description: >
+  Running models on your own hardware: VRAM, quantization, throughput.
+lessons: []
+implemented: false

@@ -1,0 +1,51 @@
+id: ssh/what-is-ssh
+questions:
+  - id: ssh-basics-q1
+    type: multiple_choice
+    concepts: [ssh, remote-shell]
+    prompt: "You run  ssh ubuntu@203.0.113.7  and then  mkdir test. Where is the directory created?"
+    options:
+      - On your laptop, in your current folder
+      - On the server, in the ubuntu user's home directory (the remote shell runs THERE)
+      - On both machines
+      - Nowhere — mkdir doesn't work over SSH
+    answer_index: 1
+    explanation: >
+      Everything typed after connecting runs on the server as the
+      server-side user. Only keystrokes and output cross the wire.
+
+  - id: ssh-basics-q2
+    type: multiple_choice
+    concepts: [ssh]
+    prompt: "You close your SSH session. What happens to the web service running on the server?"
+    options:
+      - It stops — the connection kept it alive
+      - Nothing — it's a daemon under a supervisor, not a child of your session
+      - It pauses until you reconnect
+      - It restarts
+    answer_index: 1
+    explanation: >
+      Services belong to their supervisor (systemd/Docker) and predate and
+      outlive your session. What DOES die is any process you launched
+      directly in that shell.
+
+  - id: ssh-basics-q3
+    type: text
+    concepts: [ssh]
+    prompt: "Which port does sshd listen on by convention? (number)"
+    accept: ["22"]
+    explanation: "22 — and it's the most-scanned port on the internet, which shapes all SSH hygiene."
+
+  - id: ssh-basics-q4
+    type: multiple_choice
+    concepts: [ssh]
+    prompt: "Why do internet-facing servers see constant login attempts on port 22?"
+    options:
+      - Their DNS records leak
+      - Automated bots scan the whole internet trying common passwords — background radiation, not targeting
+      - SSH broadcasts its presence
+      - AWS shares IP lists
+    answer_index: 1
+    explanation: >
+      Universal, automated, impersonal. It's why password auth gets
+      disabled and keys are the standard (next lesson).

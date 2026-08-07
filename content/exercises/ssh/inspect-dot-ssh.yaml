@@ -1,0 +1,48 @@
+id: ssh/inspect-dot-ssh
+title: "Mission: Inspect ~/.ssh"
+mission: |
+  This machine's `~/.ssh` directory is in a realistic — and realistically
+  wrong — state. (All contents are placeholders; no real key material
+  exists here.)
+
+  1. Look inside `~/.ssh` (remember: `ls -a` shows hidden entries,
+     `ls -l` shows permissions).
+  2. Read each file and identify its role from the lesson.
+  3. One file has permissions that would make real SSH refuse to work,
+     with the error `UNPROTECTED PRIVATE KEY FILE`. Find it and set the
+     mode SSH requires for a private key.
+concepts:
+  - private-key
+  - public-key
+  - authorized-keys
+  - known-hosts
+cwd: /home/learner
+initial_files:
+  /home/learner/.ssh: null
+  /home/learner/.ssh/id_ed25519:
+    content: |
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      (simulated placeholder — a real private key would be here.
+       It must be readable by its owner ONLY.)
+      -----END OPENSSH PRIVATE KEY-----
+    mode: "644"
+  /home/learner/.ssh/id_ed25519.pub:
+    content: "ssh-ed25519 AAAA...simulated-placeholder-public-key... learner@lab"
+    mode: "644"
+  /home/learner/.ssh/known_hosts:
+    content: |
+      myserver.example.com ssh-ed25519 AAAA...simulated-placeholder-fingerprint...
+    mode: "644"
+  /home/learner/.ssh/authorized_keys:
+    content: |
+      ssh-ed25519 AAAA...simulated-placeholder-from-laptop... learner@laptop
+    mode: "600"
+goal:
+  - type: mode_is
+    path: /home/learner/.ssh/id_ed25519
+    mode: "600"
+    description: "The private key (id_ed25519) is readable by its owner only (mode 600)"
+hints:
+  - "cd ~/.ssh, then ls -la. Compare each file's permission string with what the lesson says SSH requires."
+  - "The PRIVATE key is the one without .pub. Its mode shows rw-r--r-- (644) — group and others can read it. That's the problem."
+  - "chmod 600 id_ed25519 — owner read/write, nobody else anything."

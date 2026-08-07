@@ -1,0 +1,70 @@
+id: networking/journey-of-a-request
+questions:
+  - id: net-journey-q1
+    type: multiple_choice
+    concepts: [reverse-proxy]
+    prompt: "Why does this Lab put Caddy in front of the backend instead of exposing FastAPI directly?"
+    options:
+      - FastAPI can't handle HTTP
+      - "One hardened front door: Caddy terminates TLS, sets security headers, and routes — the backend and database never face the internet"
+      - Caddy is faster at Python
+      - It's required by AWS
+    answer_index: 1
+    explanation: >
+      The reverse-proxy pattern concentrates internet exposure in one
+      battle-tested process. Everything behind it lives on the private
+      network — the same pattern at every scale of production systems.
+
+  - id: net-journey-q2
+    type: multiple_choice
+    concepts: [firewall]
+    prompt: "A port scanner probes your host's port 5432. What does it see, and why?"
+    options:
+      - Connection refused, because PostgreSQL rejects strangers
+      - Silence/timeout — the firewall drops the packets; the database is also only on the internal network
+      - The PostgreSQL login prompt
+      - A redirect to port 443
+    answer_index: 1
+    explanation: >
+      Firewalls DROP disallowed traffic — no reply at all. And defense in
+      depth: even without the firewall, PostgreSQL has no public port
+      mapping. Two independent layers, one intent.
+
+  - id: net-journey-q3
+    type: multiple_choice
+    concepts: [bandwidth-latency]
+    prompt: "Pages load fast, but every click has a noticeable delay. More bandwidth will…"
+    options:
+      - Fix it — bigger pipe, faster clicks
+      - Do nothing — interaction lag is latency (round-trip time) or a slow backend, not pipe width
+      - Make it worse
+      - Fix it only on WiFi
+    answer_index: 1
+    explanation: >
+      Transfers feel bandwidth; interactions feel latency. Diagnose which
+      resource is scarce before buying more of the wrong one.
+
+  - id: net-journey-q4
+    type: multiple_choice
+    concepts: [firewall, reverse-proxy]
+    prompt: "Match the symptom to the failing step: browser shows a certificate warning."
+    options:
+      - "Step 1: DNS"
+      - "Step 3: TLS — the certificate is expired, wrong-named, or not trusted"
+      - "Step 7: backend bug"
+      - "Step 8: database down"
+    answer_index: 1
+    explanation: >
+      Each journey step has a signature: bad name→DNS, timeout→firewall,
+      refused→nothing listening, cert warning→TLS, 502→backend down,
+      500→backend bug. The map is the debugger.
+
+  - id: net-journey-q5
+    type: text
+    concepts: [reverse-proxy]
+    prompt: "In this Lab's journey, requests to paths starting with which prefix get routed to the backend? (answer like /xyz/)"
+    accept: ["/api/", "/api", "api"]
+    explanation: >
+      Caddy routes /api/* to FastAPI on the internal network; every other
+      path serves the frontend bundle. You can see this in
+      infra/docker/Caddyfile.

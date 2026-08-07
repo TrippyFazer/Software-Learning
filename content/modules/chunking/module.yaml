@@ -1,0 +1,8 @@
+id: chunking
+number: 18
+stage: 4
+title: Chunking and Document Ingestion
+description: >
+  Splitting documents so retrieval finds the right pieces.
+lessons: []
+implemented: false

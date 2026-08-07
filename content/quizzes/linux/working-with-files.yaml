@@ -1,0 +1,66 @@
+id: linux/working-with-files
+questions:
+  - id: linux-files-q1
+    type: multiple_choice
+    concepts: [redirection]
+    prompt: "config.txt holds important settings. What does  echo 'test' > config.txt  do?"
+    options:
+      - Adds 'test' as a new line at the end
+      - Replaces the entire file content with 'test'
+      - Prints the file with 'test' appended, changing nothing
+      - Fails because the file already exists
+    answer_index: 1
+    explanation: >
+      A single > truncates the file first — the old contents are gone before
+      the write happens. Appending is >>. This distinction destroys real
+      config files regularly.
+
+  - id: linux-files-q2
+    type: multiple_choice
+    concepts: [file-operations]
+    prompt: "How do you rename report-draft.txt to report-final.txt?"
+    options:
+      - "rename report-draft.txt report-final.txt"
+      - "cp report-draft.txt report-final.txt"
+      - "mv report-draft.txt report-final.txt"
+      - "touch report-final.txt"
+    answer_index: 2
+    explanation: >
+      Renaming IS moving — to a new path in the same directory. cp would
+      leave you with two files; mv leaves one with the new name.
+
+  - id: linux-files-q3
+    type: multiple_choice
+    concepts: [file-operations]
+    prompt: "rm -r old-project  — what protection does Linux give you if this was a mistake?"
+    options:
+      - Files go to a trash can for 30 days
+      - A confirmation prompt lists every file first
+      - None — the tree is gone immediately
+      - It refuses unless the directory is empty
+    answer_index: 2
+    explanation: >
+      No trash, no undo, and -r removes non-empty trees without ceremony.
+      The protective habit: ls the target first, then reuse that exact path
+      in the rm.
+
+  - id: linux-files-q4
+    type: text
+    concepts: [file-operations]
+    prompt: "Which flag makes mkdir create a whole chain of directories at once (mkdir __ a/b/c)?"
+    accept: ["-p", "p"]
+    explanation: "-p ('parents') creates every missing directory along the path."
+
+  - id: linux-files-q5
+    type: multiple_choice
+    concepts: [file-operations]
+    prompt: "Why do cp and rm need -r for directories?"
+    options:
+      - Directories are protected system objects
+      - A directory is a container — the operation must recurse through everything inside
+      - It's a safety password with no technical meaning
+      - Only root may copy directories
+    answer_index: 1
+    explanation: >
+      -r means recursive: apply the operation through the whole subtree.
+      For rm it doubles as a small speed bump before big deletions.

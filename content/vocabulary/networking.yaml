@@ -1,0 +1,112 @@
+# Module 2 — Networking Fundamentals
+- slug: ip-address
+  term: IP Address
+  mental_model: A computer's postal address on a network.
+  technical: "A 32-bit (IPv4, e.g. 203.0.113.7) or 128-bit (IPv6) identifier; combined with a port it names one communication endpoint."
+  why_it_matters: The target of every connection; step one of every reachability question.
+  related: [lan, public-private-ip, port]
+  module: networking
+
+- slug: lan
+  term: LAN
+  mental_model: Your local, private network — the building's internal mail.
+  technical: A local area network of directly-reachable hosts, typically using private address ranges behind one router.
+  why_it_matters: Where home servers and their clients find each other, fast and unfirewalled.
+  related: [wan, router, ip-address]
+  module: networking
+
+- slug: wan
+  term: WAN
+  mental_model: The wide network beyond your router — in practice, the internet.
+  technical: A wide area network interconnecting LANs; your traffic crosses it whenever you leave the local network.
+  why_it_matters: Your cloud host lives there; crossing LAN↔WAN is where reachability gets interesting.
+  related: [lan, router]
+  module: networking
+
+- slug: router
+  term: Router
+  mental_model: The mailroom connecting your LAN to the internet.
+  technical: The gateway device that forwards packets between networks and performs NAT, mapping many private addresses onto one public one.
+  why_it_matters: "Explains why 'my IP' has two answers and why hosting from home needs port forwarding."
+  related: [lan, wan, public-private-ip]
+  module: networking
+
+- slug: public-private-ip
+  term: Public vs Private IP
+  mental_model: Internet-routable addresses vs internal-only ones (192.168.x.x and friends).
+  technical: "RFC1918 ranges (10.*, 172.16-31.*, 192.168.*) are reused in every LAN and unroutable on the internet; public addresses are globally unique."
+  why_it_matters: "The #1 home-networking confusion: a 192.168.* address means nothing outside its own LAN."
+  related: [ip-address, router]
+  module: networking
+
+- slug: dns
+  term: DNS
+  mental_model: The internet's phone book — names in, addresses out.
+  technical: A distributed, delegated database queried by resolvers that cache answers per record TTL.
+  why_it_matters: First suspect when a site is unreachable; caching explains 'propagation' weirdness.
+  related: [domain, ip-address]
+  module: networking
+
+- slug: domain
+  term: Domain
+  mental_model: A name you lease (example.com) and hang subdomains off.
+  technical: "A delegated zone in the DNS hierarchy; records within it (like the A record name → IPv4) are set by its authoritative servers."
+  why_it_matters: Stable identity for your services; move hosts by changing one record.
+  related: [dns]
+  module: networking
+
+- slug: port
+  term: Port
+  mental_model: A numbered door into a server; one listening program per door.
+  technical: "A 16-bit transport-layer identifier; with an IP it names an endpoint. Well-known: 22 SSH, 80 HTTP, 443 HTTPS, 5432 PostgreSQL."
+  why_it_matters: Firewall rules, URLs, and 'connection refused' all speak port.
+  related: [ip-address, tcp, firewall]
+  module: networking
+
+- slug: tcp
+  term: TCP
+  mental_model: The reliable pipe — bytes arrive complete and in order.
+  technical: "Connection-oriented transport with acknowledgment and retransmission over an unreliable network. Refused = machine answered, nothing listening; timeout = nothing answered."
+  why_it_matters: HTTP, SSH, and databases ride on it; refused-vs-timeout is diagnostic gold.
+  related: [port, http]
+  module: networking
+
+- slug: http
+  term: HTTP
+  mental_model: "The web's request/response language: ask for a path, get a status code and body."
+  technical: "Text-based protocol over TCP; status classes 2xx ok, 3xx redirect, 4xx client error, 5xx server error."
+  why_it_matters: Every interaction with this Lab's API is one; status codes are the shared taxonomy of web failure.
+  related: [https, tcp, port]
+  module: networking
+
+- slug: https
+  term: HTTPS
+  mental_model: HTTP inside an encrypted, identity-proven envelope.
+  technical: HTTP over TLS; certificates prove the server's name, and the channel gains confidentiality and integrity.
+  why_it_matters: "Mandatory for anything internet-facing; the padlock secures the pipe, not the site's honesty."
+  related: [http, tcp]
+  module: networking
+
+- slug: firewall
+  term: Firewall
+  mental_model: The bouncer checking every arriving packet against a list.
+  technical: "Rule-based packet filtering (allow TCP 443 from anywhere; drop the rest). Dropped traffic looks like silence — timeouts, not refusals."
+  why_it_matters: Why this host exposes exactly 22/80/443 and the database is unreachable by design.
+  related: [port, reverse-proxy]
+  module: networking
+
+- slug: reverse-proxy
+  term: Reverse Proxy
+  mental_model: The single hardened front door routing requests to internal services.
+  technical: "A server (Caddy here) that terminates TLS, sets headers, and forwards by path/host to backends that never face the internet."
+  why_it_matters: "The pattern behind this Lab and nearly every production web system: many services, one exposure point."
+  related: [firewall, https, port]
+  module: networking
+
+- slug: bandwidth-latency
+  term: Bandwidth vs Latency
+  mental_model: Pipe width (data per second) vs pipe length (time per round trip).
+  technical: "Throughput in bits/s vs round-trip time in ms (floor-bounded by distance). Transfers feel bandwidth; interactions feel latency."
+  why_it_matters: "'It's slow' has two different diagnoses with different fixes — name the scarce resource before spending."
+  related: [tcp]
+  module: networking

@@ -1,0 +1,59 @@
+id: linux/filesystem
+questions:
+  - id: linux-fs-q1
+    type: multiple_choice
+    concepts: [path]
+    prompt: "You are in /home/learner. Which command does NOT take you to /home/learner/projects?"
+    options:
+      - "cd projects"
+      - "cd /home/learner/projects"
+      - "cd ~/projects"
+      - "cd /projects"
+    answer_index: 3
+    explanation: >
+      /projects is an absolute path to a "projects" directory at the root of
+      the tree — a different place entirely. The other three all resolve to
+      the same directory: relative, absolute, and home-anchored forms.
+
+  - id: linux-fs-q2
+    type: multiple_choice
+    concepts: [working-directory]
+    prompt: "cat notes.txt says 'No such file or directory', but the file definitely exists. Most likely explanation?"
+    options:
+      - The file is corrupted
+      - Your working directory isn't the directory the file is in
+      - cat can't read .txt files
+      - The filesystem is full
+    answer_index: 1
+    explanation: >
+      Relative paths resolve from the working directory. The reflex: pwd,
+      then ls — you're probably not standing where you think you are.
+
+  - id: linux-fs-q3
+    type: text
+    concepts: [working-directory]
+    prompt: "Which command prints your current working directory? (one word)"
+    accept: ["pwd"]
+    explanation: "pwd — print working directory. The 'where am I?' command."
+
+  - id: linux-fs-q4
+    type: multiple_choice
+    concepts: [filesystem]
+    prompt: "Where would you look first for a system service's log file, by Linux convention?"
+    options:
+      - "/home"
+      - "/usr/bin"
+      - "/var/log"
+      - "/etc"
+    answer_index: 2
+    explanation: >
+      /var/log is the conventional home of logs (as /etc is for
+      configuration and /usr/bin for programs). These conventions are what
+      make unfamiliar machines navigable.
+
+  - id: linux-fs-q5
+    type: text
+    concepts: [path]
+    prompt: "What does .. mean in a path? (answer: parent, parent directory, or the directory above)"
+    accept: ["parent", "parent directory", "the parent directory", "the directory above", "directory above"]
+    explanation: ".. always refers to the parent directory; cd .. steps one level up the tree."

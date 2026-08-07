@@ -1,0 +1,8 @@
+id: embeddings
+number: 16
+stage: 4
+title: Embeddings and Vector Search
+description: >
+  Meaning as geometry: similarity search over high-dimensional vectors.
+lessons: []
+implemented: false

@@ -1,0 +1,104 @@
+# Module 1 — Linux Fundamentals
+- slug: filesystem
+  term: Filesystem
+  mental_model: One upside-down tree holding everything on the machine, rooted at /.
+  technical: The hierarchical namespace of directories and files; additional storage is mounted into the same tree rather than lettered separately.
+  why_it_matters: Every server task starts with "where is the thing" — this is the where.
+  related: [path, directory]
+  module: linux
+
+- slug: path
+  term: Path
+  mental_model: "Directions through the tree: /home/learner/projects."
+  technical: "A file's address. Absolute paths start at / ; relative paths resolve from the working directory; .. is the parent, ~ is home."
+  why_it_matters: Every command takes paths; most beginner errors are path errors.
+  related: [filesystem, working-directory]
+  module: linux
+
+- slug: directory
+  term: Directory
+  mental_model: A folder — a container for files and other directories.
+  technical: A filesystem node mapping names to other nodes; needs the execute bit to be entered.
+  why_it_matters: The tree's branches; mkdir/cd/ls revolve around them.
+  related: [filesystem, path]
+  module: linux
+
+- slug: working-directory
+  term: Working Directory
+  mental_model: Where your shell is currently standing.
+  technical: The directory against which relative paths are resolved; printed by pwd, changed by cd.
+  why_it_matters: "'No such file or directory' for a file you can see usually means you're not where you think."
+  related: [path, directory]
+  module: linux
+
+- slug: file-operations
+  term: File Operations
+  mental_model: "The six verbs: mkdir, touch, cat, cp, mv, rm."
+  technical: Standalone programs the shell runs; mv also renames (renaming is moving); rm is immediate and permanent.
+  why_it_matters: Deployment scripts are these verbs in sequence; rm is the first command that can really hurt.
+  related: [redirection, path]
+  module: linux
+
+- slug: redirection
+  term: Redirection
+  mental_model: "Aiming a command's output into a file: echo hi > file."
+  technical: "Shell operators: > truncates-then-writes, >> appends. The file is opened before the command runs — > can destroy before you notice."
+  why_it_matters: How files get content from commands, and a classic foot-gun (meant >>, typed >).
+  related: [file-operations]
+  module: linux
+
+- slug: user
+  term: User (Linux)
+  mental_model: An identity the OS tracks; every process runs as somebody.
+  technical: A uid with a home directory and group memberships; services get dedicated low-privilege users to bound damage.
+  why_it_matters: "The diagnosis question 'who is this process running as?' unlocks most permission mysteries."
+  related: [permission, owner]
+  module: linux
+
+- slug: permission
+  term: Permission
+  mental_model: The access card on every file — who may read, write, execute.
+  technical: "Nine bits: rwx for owner/group/others; numerically r=4 w=2 x=1 (755, 644, 600). Read with ls -l, changed with chmod."
+  why_it_matters: Permission denied is the most common wall in server work; reading triplets makes it a door.
+  related: [owner, execute-bit, user]
+  module: linux
+
+- slug: owner
+  term: Owner
+  mental_model: The user a file belongs to.
+  technical: The uid whose triplet applies first in permission checks; changed with chown.
+  why_it_matters: Wrong ownership is the classic reason a service can't read its own files.
+  related: [permission, user]
+  module: linux
+
+- slug: execute-bit
+  term: Execute Bit
+  mental_model: "The x: permission to run a file as a program (or enter a directory)."
+  technical: "File: may be executed. Directory: may be traversed. Its absence causes './script.sh: Permission denied'."
+  why_it_matters: The single most common script-won't-run cause; fixed with chmod +x.
+  related: [permission, file-operations]
+  module: linux
+
+- slug: process-management
+  term: Process Management
+  mental_model: Seeing and steering what's running right now.
+  technical: Processes are listed (ps), supervised (systemd, docker), and end by exiting or crashing; a down service is a process that ended and wasn't restarted.
+  why_it_matters: "'Is it running?' is diagnostic question #1."
+  related: [daemon, log]
+  module: linux
+
+- slug: daemon
+  term: Daemon
+  mental_model: A background service process — the d in sshd and systemd.
+  technical: A long-running process detached from any terminal, started and supervised by the init system.
+  why_it_matters: Server software is daemons; the word is everywhere in documentation.
+  related: [process-management, service]
+  module: linux
+
+- slug: log
+  term: Log
+  mental_model: The diary a service keeps — timestamped lines of what happened.
+  technical: "Append-only records (files under /var/log, journalctl, docker compose logs) with timestamp, severity, message."
+  why_it_matters: The primary evidence in every diagnosis; read from the end backwards.
+  related: [daemon, process-management]
+  module: linux

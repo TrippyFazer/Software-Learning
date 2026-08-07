@@ -1,0 +1,65 @@
+id: networking/ports-and-protocols
+questions:
+  - id: net-port-q1
+    type: multiple_choice
+    concepts: [port]
+    prompt: "An IP address gets you to the machine. What gets you to the right program on it?"
+    options:
+      - The MAC address
+      - The port number the program is listening on
+      - The hostname
+      - The URL path
+    answer_index: 1
+    explanation: >
+      One machine, many listening programs — each behind a 16-bit port
+      number. Every connection targets IP + port.
+
+  - id: net-port-q2
+    type: multiple_choice
+    concepts: [tcp]
+    prompt: "'Connection refused' vs a hang-then-timeout. What's the diagnostic difference?"
+    options:
+      - They mean the same thing
+      - "Refused: the machine answered but nothing listens on that port. Timeout: nothing answered — wrong address or a firewall silently dropping"
+      - Refused is a DNS problem; timeout is a TLS problem
+      - Refused means the server is overloaded
+    answer_index: 1
+    explanation: >
+      Refused is an active "no" (host up, port closed); timeout is silence
+      (host absent or firewall drop). They point at different steps of the
+      chain.
+
+  - id: net-port-q3
+    type: text
+    concepts: [port]
+    prompt: "Which port does HTTPS use by convention? (number)"
+    accept: ["443"]
+    explanation: "443 — as 80 is HTTP, 22 is SSH, 5432 is PostgreSQL. The famous numbers are worth knowing cold."
+
+  - id: net-port-q4
+    type: multiple_choice
+    concepts: [http]
+    prompt: "A response comes back 502. Which class of thing went wrong?"
+    options:
+      - You typed a wrong URL (client error)
+      - The server side broke — 5xx means the problem is theirs, and 502 specifically means the proxy couldn't reach its backend
+      - The page moved (redirect)
+      - Nothing — 502 is success
+    answer_index: 1
+    explanation: >
+      2xx ok, 3xx redirect, 4xx client's fault, 5xx server's fault.
+      502 Bad Gateway = the front door works but the room behind it is dark.
+
+  - id: net-port-q5
+    type: multiple_choice
+    concepts: [https]
+    prompt: "What does the HTTPS padlock actually guarantee?"
+    options:
+      - The site is honest and safe to buy from
+      - The channel is encrypted, tamper-proof, and the certificate matches the name you connected to
+      - The server has no vulnerabilities
+      - Your password is stored securely on the server
+    answer_index: 1
+    explanation: >
+      TLS secures the pipe and proves the endpoint's name — nothing more.
+      A phishing site can have a perfectly valid padlock.

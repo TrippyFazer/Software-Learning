@@ -1,0 +1,8 @@
+id: home-vs-cloud
+number: 24
+stage: 5
+title: Home Server vs Cloud
+description: >
+  Where workloads should live: cost, control, privacy, and reliability trade-offs.
+lessons: []
+implemented: false

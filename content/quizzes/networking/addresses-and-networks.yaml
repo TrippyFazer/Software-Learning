@@ -1,0 +1,60 @@
+id: networking/addresses-and-networks
+questions:
+  - id: net-addr-q1
+    type: multiple_choice
+    concepts: [public-private-ip]
+    prompt: "Your laptop reports IP 192.168.1.42, but whatsmyip.com says 84.23.19.7. Which is lying?"
+    options:
+      - The laptop — its setting is stale
+      - The website — it's showing someone else's address
+      - Neither — the private LAN address and the router's public address are both correct answers to different questions
+      - Both — you can only have one IP
+    answer_index: 2
+    explanation: >
+      192.168.1.42 is the laptop's address on the LAN; 84.23.19.7 is the
+      router's public address, which all your outbound traffic wears (NAT).
+      Two networks, two addresses, both true.
+
+  - id: net-addr-q2
+    type: multiple_choice
+    concepts: [public-private-ip]
+    prompt: "Why can't your friend across town reach your Plex server at 192.168.1.50?"
+    options:
+      - Plex blocks external connections
+      - Private addresses aren't routable on the internet — their network has its own 192.168.1.50
+      - Their ISP is too slow
+      - Port 32400 doesn't exist outside LANs
+    answer_index: 1
+    explanation: >
+      RFC1918 ranges are reused in every LAN and refused by internet
+      routers. Reaching your server from outside requires your PUBLIC IP
+      plus deliberate router configuration.
+
+  - id: net-addr-q3
+    type: multiple_choice
+    concepts: [router, lan, wan]
+    prompt: "What does the router actually do at the LAN/WAN boundary?"
+    options:
+      - Speeds packets up
+      - Forwards packets between the networks and rewrites private addresses to its public one (NAT)
+      - Converts WiFi to electricity
+      - Stores your files
+    answer_index: 1
+    explanation: >
+      The router is the gateway and translator: outbound traffic gets its
+      public address; replies get mapped back to the right private host.
+
+  - id: net-addr-q4
+    type: multiple_choice
+    concepts: [ip-address]
+    prompt: "Your Lightsail host differs from your laptop in that it…"
+    options:
+      - Has no IP address
+      - Wears a public IP directly, reachable from anywhere — which is why its firewall matters so much
+      - Can only be reached from AWS
+      - Uses IPv6 exclusively
+    answer_index: 1
+    explanation: >
+      Cloud hosts are directly internet-reachable by design — that's their
+      job, and it's why exposure control (Module 22's firewall discipline)
+      starts on day one.

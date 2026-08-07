@@ -1,0 +1,8 @@
+id: virtualization
+number: 7
+stage: 2
+title: Virtualization and Proxmox
+description: >
+  VMs, hypervisors, and containers-vs-VMs — slicing one machine into many.
+lessons: []
+implemented: false

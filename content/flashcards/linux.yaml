@@ -1,0 +1,84 @@
+# Module 1 flashcards
+- slug: card-filesystem
+  front: Filesystem
+  back: One tree rooted at /. No drive letters — extra disks are mounted into the same tree.
+  concepts: [filesystem]
+  module: linux
+
+- slug: card-path
+  front: "Absolute vs relative path"
+  back: "Absolute starts with / and works anywhere; relative resolves from the working directory. .. = parent, ~ = home."
+  concepts: [path]
+  module: linux
+
+- slug: card-working-directory
+  front: pwd / ls / cd
+  back: "Where am I / what's here / go there — the navigation trio."
+  concepts: [working-directory]
+  module: linux
+
+- slug: card-home-directory
+  front: "~ (tilde)"
+  back: "Your home directory, /home/<user>. cd ~ from anywhere brings you home."
+  concepts: [path]
+  module: linux
+
+- slug: card-mkdir-touch
+  front: mkdir / touch
+  back: "Create a directory / create an empty file. mkdir -p builds whole chains (a/b/c) at once."
+  concepts: [file-operations]
+  module: linux
+
+- slug: card-cp-mv-rm
+  front: cp / mv / rm
+  back: "Copy, move-or-rename, delete. Directories need -r. rm is immediate and permanent — no trash."
+  concepts: [file-operations]
+  module: linux
+
+- slug: card-redirection
+  front: "> vs >>"
+  back: "> replaces the file's entire contents (truncates first!); >> appends. Meant >>, typed > is a classic data-loss bug."
+  concepts: [redirection]
+  module: linux
+
+- slug: card-permissions
+  front: "ls -l permission string"
+  back: "Type + three rwx triplets: owner, group, others. -rwxr-xr-- = file, owner rwx, group r-x, others r--."
+  concepts: [permission]
+  module: linux
+
+- slug: card-rwx
+  front: "r / w / x as numbers"
+  back: "r=4, w=2, x=1, summed per triplet: 755 = rwxr-xr-x (programs), 644 = rw-r--r-- (data), 600 = rw------- (secrets)."
+  concepts: [permission]
+  module: linux
+
+- slug: card-chmod
+  front: chmod
+  back: "Change permissions: chmod 755 file (numeric, exact) or chmod +x file (symbolic, add execute)."
+  concepts: [permission]
+  module: linux
+
+- slug: card-execute-bit
+  front: Execute bit (x)
+  back: "On files: may run as a program (./script.sh needs it). On directories: may enter. Missing x = 'Permission denied'."
+  concepts: [execute-bit]
+  module: linux
+
+- slug: card-daemon
+  front: Daemon
+  back: "A background service process (sshd, systemd). Server software is daemons."
+  concepts: [daemon]
+  module: linux
+
+- slug: card-log
+  front: Reading logs
+  back: "Timestamp + severity + message. Read from the end backwards; the last ERROR before silence is usually the cause."
+  concepts: [log]
+  module: linux
+
+- slug: card-var-log
+  front: /var/log
+  back: "The conventional directory for system and service logs — the first place to look."
+  concepts: [log]
+  module: linux

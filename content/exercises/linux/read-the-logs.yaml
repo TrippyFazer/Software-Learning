@@ -1,0 +1,47 @@
+id: linux/read-the-logs
+title: "Mission: Read the Logs"
+mission: |
+  A web application on this machine died last night. Its log survived.
+
+  Find the log (convention tells you where logs live), read it **from the
+  end backwards**, and determine which port the database connection was
+  failing on.
+
+  Record your answer by writing the port number into a file:
+
+  ```
+  echo <the-port-number> > /home/learner/answer.txt
+  ```
+concepts:
+  - log
+  - daemon
+cwd: /home/learner
+initial_files:
+  /var/log: null
+  /var/log/webapp.log:
+    content: |
+      2026-08-06 22:14:01 INFO  webapp starting, version 2.3.1
+      2026-08-06 22:14:01 INFO  loading configuration from /etc/webapp/config.yaml
+      2026-08-06 22:14:02 INFO  listening on port 8080
+      2026-08-06 23:41:17 INFO  served 1,204 requests in the last hour
+      2026-08-07 00:41:17 INFO  served 987 requests in the last hour
+      2026-08-07 01:03:44 WARNING database connection slow (1.9s)
+      2026-08-07 01:04:52 ERROR cannot connect to database at localhost port 5432: connection refused
+      2026-08-07 01:04:52 ERROR retrying database connection (attempt 1/3)
+      2026-08-07 01:05:02 ERROR retrying database connection (attempt 2/3)
+      2026-08-07 01:05:12 ERROR retrying database connection (attempt 3/3)
+      2026-08-07 01:05:22 ERROR giving up: database unreachable
+      2026-08-07 01:05:22 INFO  webapp shutting down
+  /var/log/auth.log:
+    content: |
+      2026-08-06 21:02:11 INFO sshd accepted publickey for learner
+      2026-08-07 03:22:45 INFO sshd connection closed
+goal:
+  - type: file_contains
+    path: /home/learner/answer.txt
+    text: "5432"
+    description: "answer.txt contains the port the database connection failed on"
+hints:
+  - "Logs conventionally live under /var/log. ls /var/log to see what's there."
+  - "cat /var/log/webapp.log and read the ERROR lines near the end."
+  - "The line says 'cannot connect to database at localhost port ____'. echo that number > /home/learner/answer.txt"

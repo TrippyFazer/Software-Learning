@@ -1,0 +1,8 @@
+id: security
+number: 22
+stage: 5
+title: Security
+description: >
+  Threat models, attack surface, and defense in depth for internet-facing systems.
+lessons: []
+implemented: false

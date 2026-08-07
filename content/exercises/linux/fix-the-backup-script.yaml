@@ -1,0 +1,41 @@
+id: linux/fix-the-backup-script
+title: "Mission: Fix the Backup Script"
+mission: |
+  A nightly backup script has been failing. Run it and see for yourself:
+
+  ```
+  ./backup.sh
+  ```
+
+  Something is wrong. Figure out **why** — this lesson gave you the tool to
+  *look at* the problem — then fix it and run the script successfully.
+
+  This is a failure-driven exercise on purpose: the diagnosis is the lesson.
+concepts:
+  - permission
+  - execute-bit
+  - owner
+cwd: /home/learner
+initial_files:
+  /home/learner/backup.sh:
+    content: |
+      #!/bin/bash
+      # Nightly backup: archives the home directory into backups/
+      tar -czf backups/home.tar.gz .
+      echo "Backup complete."
+    mode: "644"
+    exec_output: |
+      Archiving home directory...
+      Backup complete: backups/home.tar.gz
+    exec_creates:
+      /home/learner/backups/home.tar.gz: "(simulated archive of /home/learner)"
+  /home/learner/notes.txt:
+    content: "Remember to check the backups actually ran."
+goal:
+  - type: file_exists
+    path: /home/learner/backups/home.tar.gz
+    description: "backup.sh has run successfully — backups/home.tar.gz exists"
+hints:
+  - "The error says Permission denied. Which permissions does backup.sh actually have? ls -l shows you."
+  - "Compare what you see (rw-r--r--) with what running a file requires. One letter is missing."
+  - "chmod +x backup.sh grants the execute bit. Then try ./backup.sh again."

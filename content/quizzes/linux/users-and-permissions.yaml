@@ -1,0 +1,67 @@
+id: linux/users-and-permissions
+questions:
+  - id: linux-perm-q1
+    type: multiple_choice
+    concepts: [permission]
+    prompt: "ls -l shows  -rw-r--r-- 1 learner learner 512 backup.sh. Why does ./backup.sh fail?"
+    options:
+      - The file is empty
+      - The owner triplet rw- lacks the execute bit
+      - Only root may run scripts
+      - The group is wrong
+    answer_index: 1
+    explanation: >
+      Running a file requires x. The owner's triplet is rw- : read and
+      write, no execute. chmod +x adds it — this is the exact scenario of
+      this lesson's mission.
+
+  - id: linux-perm-q2
+    type: text
+    concepts: [permission]
+    prompt: "What numeric mode is rwxr-xr-x? (three digits)"
+    accept: ["755"]
+    explanation: "rwx=4+2+1=7, r-x=4+0+1=5, r-x=5 → 755, the standard mode for programs and directories."
+
+  - id: linux-perm-q3
+    type: multiple_choice
+    concepts: [permission]
+    prompt: "Why is chmod 777 the wrong fix for a permission error?"
+    options:
+      - It only works for root
+      - 777 is not a valid mode
+      - It removes all protection for everyone instead of granting the specific access needed
+      - It makes the file hidden
+    answer_index: 2
+    explanation: >
+      777 grants read+write+execute to every user on the system — it
+      "fixes" the symptom by deleting the security. Diagnose who needs what,
+      grant exactly that.
+
+  - id: linux-perm-q4
+    type: multiple_choice
+    concepts: [user, owner]
+    prompt: "A web service can't read its own config file. The most useful first question is:"
+    options:
+      - How big is the file?
+      - Which user does the service run as, and what do ls -l's owner and triplets say?
+      - When was the file created?
+      - Is the file in /home?
+    answer_index: 1
+    explanation: >
+      Permission checks are (process's user) vs (file's owner/group/mode).
+      Both halves come from one ls -l plus knowing the service user — the
+      complete diagnostic in two facts.
+
+  - id: linux-perm-q5
+    type: multiple_choice
+    concepts: [user]
+    prompt: "Why do well-run systems give each service its own low-privilege user?"
+    options:
+      - It makes the service faster
+      - Usernames are required by systemd
+      - A compromised or buggy service can then damage only what that user can touch
+      - It saves memory
+    answer_index: 2
+    explanation: >
+      The service user's permissions are the blast radius. This Lab's own
+      API container runs as a non-root user for exactly this reason.

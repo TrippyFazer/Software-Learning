@@ -1,0 +1,8 @@
+id: capstone
+number: 30
+stage: 6
+title: Capstone Architecture
+description: >
+  Design Brain Core and the home lab end-to-end — and defend the decisions.
+lessons: []
+implemented: false

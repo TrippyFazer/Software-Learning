@@ -1,0 +1,54 @@
+id: networking/dns-and-domains
+questions:
+  - id: net-dns-q1
+    type: multiple_choice
+    concepts: [dns, domain]
+    prompt: "To make learn.example.com reach your Lightsail host, you create…"
+    options:
+      - A firewall rule on the router
+      - An A record mapping the name to the host's public IPv4 address
+      - A TLS certificate
+      - A port forward on 53
+    answer_index: 1
+    explanation: >
+      The A record is the name→IPv4 mapping in your domain's DNS zone.
+      (TLS certificates come later in the journey and depend on DNS already
+      working.)
+
+  - id: net-dns-q2
+    type: multiple_choice
+    concepts: [dns]
+    prompt: "You changed an A record 10 minutes ago; your phone sees the new server, your laptop the old one. Why?"
+    options:
+      - The record is corrupted
+      - Laptops update DNS weekly
+      - Different resolvers/devices cached the old answer and its TTL hasn't expired everywhere
+      - The new server rejects laptops
+    answer_index: 2
+    explanation: >
+      DNS answers are cached at several layers for the record's TTL.
+      "Propagation delay" is just caches expiring at different times.
+
+  - id: net-dns-q3
+    type: multiple_choice
+    concepts: [dns]
+    prompt: "learn.example.com resolves correctly, but the site is unreachable. What does that tell you?"
+    options:
+      - DNS is broken
+      - DNS is fine — the problem is further down the chain (connection, firewall, or server)
+      - The domain has expired
+      - The TTL is too low
+    answer_index: 1
+    explanation: >
+      DNS answers exactly one question: name → address. If that works,
+      move down the stack: TCP, firewall, the services themselves.
+
+  - id: net-dns-q4
+    type: text
+    concepts: [domain]
+    prompt: "In learn.example.com, what is 'learn' called? (one word)"
+    accept: ["subdomain", "a subdomain"]
+    explanation: >
+      A subdomain — free structure under your domain. learn., brain., and
+      plex. can point at the same host or different ones, each via its own
+      record.

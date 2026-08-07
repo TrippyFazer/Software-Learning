@@ -1,0 +1,8 @@
+id: ai-assisted-dev
+number: 29
+stage: 6
+title: AI-Assisted Software Development
+description: >
+  Working with Claude Code and friends: judging, steering, and verifying generated systems.
+lessons: []
+implemented: false

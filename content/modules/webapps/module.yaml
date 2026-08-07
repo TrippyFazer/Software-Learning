@@ -1,0 +1,8 @@
+id: webapps
+number: 11
+stage: 3
+title: Web Applications and APIs
+description: >
+  Requests, endpoints, API design, and backend logic with FastAPI.
+lessons: []
+implemented: false

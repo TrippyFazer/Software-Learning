@@ -1,0 +1,12 @@
+id: ssh
+number: 3
+stage: 1
+title: SSH and Remote Administration
+description: >
+  The tool you'll use to administer every server you ever rent or build:
+  what SSH actually is, why keys beat passwords, and how the files in
+  ~/.ssh fit together — including the permission rules that trip everyone.
+lessons:
+  - what-is-ssh
+  - keys-not-passwords
+implemented: true

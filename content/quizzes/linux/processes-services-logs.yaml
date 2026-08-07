@@ -1,0 +1,64 @@
+id: linux/processes-services-logs
+questions:
+  - id: linux-psl-q1
+    type: multiple_choice
+    concepts: [process-management, daemon]
+    prompt: "What's the difference between a process and a service?"
+    options:
+      - They're unrelated concepts
+      - A service is a process with a stay-up contract — start at boot, restart on failure
+      - Services are written in different languages
+      - A process runs in the foreground window only
+    answer_index: 1
+    explanation: >
+      Every service is a process; the "service" part is the supervision
+      contract (systemd, or docker's restart policy here).
+
+  - id: linux-psl-q2
+    type: multiple_choice
+    concepts: [log]
+    prompt: "'The app is down.' What's the correct order of the diagnostic loop?"
+    options:
+      - Restart it; if that fails, restart the whole server
+      - Check whether the process is running → read its log from the end backwards → fix the cause → restart
+      - Read every log on the machine, then check processes
+      - Reinstall the application
+    answer_index: 1
+    explanation: >
+      Running? → why did it stop (log)? → fix → restart → watch. Read the
+      log before the third restart — a service that died for a reason will
+      die the same way again.
+
+  - id: linux-psl-q3
+    type: text
+    concepts: [log]
+    prompt: "By convention, which directory holds system and service logs?"
+    accept: ["/var/log", "var/log"]
+    explanation: "/var/log — the first place to look on any Linux machine."
+
+  - id: linux-psl-q4
+    type: multiple_choice
+    concepts: [log]
+    prompt: "In the mission's log, the app retried three times and shut down. What single log line mattered most for diagnosis?"
+    options:
+      - "webapp starting, version 2.3.1"
+      - "served 1,204 requests in the last hour"
+      - "cannot connect to database at localhost port 5432: connection refused"
+      - "webapp shutting down"
+    answer_index: 2
+    explanation: >
+      The specific ERROR naming the cause (database unreachable, port 5432)
+      is the diagnosis. The shutdown line is the consequence; the INFO lines
+      are routine noise.
+
+  - id: linux-psl-q5
+    type: multiple_choice
+    concepts: [daemon]
+    prompt: "The 'd' in sshd and systemd stands for…"
+    options:
+      - "distributed"
+      - "daemon — a background service process"
+      - "device"
+      - "debug"
+    answer_index: 1
+    explanation: "Server software is daemons: long-running background processes detached from any terminal."

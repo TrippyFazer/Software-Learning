@@ -1,0 +1,8 @@
+id: authn
+number: 21
+stage: 5
+title: Authentication and Authorization
+description: >
+  Identity and permission on the web — taught partly from this Lab's own login.
+lessons: []
+implemented: false

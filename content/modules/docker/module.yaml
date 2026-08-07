@@ -1,0 +1,8 @@
+id: docker
+number: 8
+stage: 2
+title: Docker
+description: >
+  Images, containers, volumes, and networks — taught partly from this Lab's own compose file.
+lessons: []
+implemented: false

@@ -1,0 +1,8 @@
+id: retrieval-quality
+number: 19
+stage: 4
+title: Retrieval Quality
+description: >
+  Measuring and improving whether search returns what actually matters.
+lessons: []
+implemented: false

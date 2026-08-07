@@ -1,0 +1,48 @@
+# Module 3 — SSH and Remote Administration
+- slug: ssh
+  term: SSH
+  mental_model: An encrypted terminal on a machine you can't touch — commands run there, text travels.
+  technical: "The Secure Shell protocol: TCP to port 22, negotiated encryption, mutual authentication, then a remote shell (or file transfer) over the channel."
+  why_it_matters: The administration channel for every Linux server you'll ever rent or build.
+  related: [remote-shell, port, public-key]
+  module: ssh
+
+- slug: remote-shell
+  term: Remote Shell
+  mental_model: A shell process running on the server, displayed on your screen.
+  technical: "sshd spawns a shell as the authenticated server-side user; your session's child processes die with the session — daemons don't."
+  why_it_matters: "Explains both what you can do (everything, as that user) and the classic 'my task died when I closed the laptop'."
+  related: [ssh]
+  module: ssh
+
+- slug: public-key
+  term: Public Key
+  mental_model: The shareable lock — you hand it to every server you want to open.
+  technical: The public half of an asymmetric pair (id_ed25519.pub); servers verify your login signature against it. Sharing it is the intended workflow.
+  why_it_matters: What you paste into Lightsail or authorized_keys; the .pub suffix is your safety rail.
+  related: [private-key, authorized-keys]
+  module: ssh
+
+- slug: private-key
+  term: Private Key
+  mental_model: The actual key — it never leaves your machine, ever.
+  technical: "The secret half (id_ed25519); logins are challenge signatures, so it is never transmitted. SSH requires mode 600 and refuses otherwise."
+  why_it_matters: Whoever holds it is you; one that has ever been pasted anywhere is burned — rotate it.
+  related: [public-key, permission]
+  module: ssh
+
+- slug: authorized-keys
+  term: authorized_keys
+  mental_model: The server-side guest list — which locks (public keys) may open this account.
+  technical: "~/.ssh/authorized_keys on the SERVER: one public key per line; any listed key may log in as that user."
+  why_it_matters: Adding a machine's access = appending its public key here; revoking = deleting the line.
+  related: [public-key, known-hosts]
+  module: ssh
+
+- slug: known-hosts
+  term: known_hosts
+  mental_model: Your client's memory of which servers are really themselves.
+  technical: "~/.ssh/known_hosts on the CLIENT: fingerprints recorded on first connect and checked ever after; a mismatch triggers the HOST IDENTIFICATION CHANGED warning."
+  why_it_matters: The other direction of trust — it protects you from impostor servers.
+  related: [authorized-keys, ssh]
+  module: ssh

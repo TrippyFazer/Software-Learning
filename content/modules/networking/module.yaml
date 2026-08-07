@@ -1,0 +1,15 @@
+id: networking
+number: 2
+stage: 1
+title: Networking Fundamentals
+description: >
+  How computers find and talk to each other: addresses and networks, DNS,
+  ports and protocols, firewalls and reverse proxies — culminating in the
+  full journey of a request to learn.example.com, the exact path your
+  browser takes to reach this Lab.
+lessons:
+  - addresses-and-networks
+  - dns-and-domains
+  - ports-and-protocols
+  - journey-of-a-request
+implemented: true

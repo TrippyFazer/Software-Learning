@@ -1,0 +1,37 @@
+id: linux/explore-the-filesystem
+title: "Mission: Explore the Filesystem"
+mission: |
+  You've landed in a small filesystem. Somewhere in it, a file contains
+  instructions meant for you.
+
+  Tools: `pwd` (where am I), `ls` (what's here), `cd` (go there),
+  `cat` (read a file). Wander until you find it — then do what it says.
+concepts:
+  - filesystem
+  - path
+  - directory
+  - working-directory
+cwd: /home/learner
+initial_files:
+  /home/learner/README.txt:
+    content: |
+      Somewhere under your home directory is a directory called field-notes.
+      Start looking. (Hint: ls shows directories, cd enters them.)
+  /home/learner/docs: null
+  /home/learner/docs/server-checklist.txt:
+    content: "1. check processes  2. check logs  3. check disk (a preview of things to come)"
+  /home/learner/projects: null
+  /home/learner/projects/field-notes: null
+  /home/learner/projects/field-notes/instructions.txt:
+    content: |
+      Found me. Final step: create an empty file named  done.txt
+      in THIS directory (the one this file is in).
+      You know the command for creating an empty file.
+goal:
+  - type: file_exists
+    path: /home/learner/projects/field-notes/done.txt
+    description: "done.txt exists inside projects/field-notes/"
+hints:
+  - "Start with pwd and ls. README.txt looks readable — cat README.txt."
+  - "ls shows projects/. cd projects, then ls again. Directories inside directories."
+  - "Once you're in field-notes (check with pwd), read instructions.txt, then: touch done.txt"

@@ -1,0 +1,15 @@
+id: linux
+number: 1
+stage: 1
+title: Linux Fundamentals
+description: >
+  The operating system you'll live in: the filesystem tree, moving and
+  making things, users and permissions, and how to see what a server is
+  doing through processes, services, and logs. Practiced hands-on in the
+  simulated terminal.
+lessons:
+  - filesystem
+  - working-with-files
+  - users-and-permissions
+  - processes-services-logs
+implemented: true

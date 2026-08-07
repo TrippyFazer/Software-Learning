@@ -1,0 +1,36 @@
+# Module 3 flashcards
+- slug: card-ssh
+  front: SSH
+  back: "Encrypted remote shell over TCP port 22. Commands run on the server; only text travels. The universal admin channel."
+  concepts: [ssh]
+  module: ssh
+
+- slug: card-sshd
+  front: sshd
+  back: "The SSH daemon: listens on 22, authenticates you, spawns your remote shell as the server-side user."
+  concepts: [ssh, remote-shell]
+  module: ssh
+
+- slug: card-keypair
+  front: "Key pair (public / private)"
+  back: "Public = shareable lock, goes on servers. Private = never leaves your machine, never transmitted — logins are challenge signatures."
+  concepts: [public-key, private-key]
+  module: ssh
+
+- slug: card-authorized-keys
+  front: authorized_keys
+  back: "SERVER-side guest list: public keys allowed to log in as this user. Append to grant, delete line to revoke."
+  concepts: [authorized-keys]
+  module: ssh
+
+- slug: card-known-hosts
+  front: known_hosts
+  back: "CLIENT-side memory of server fingerprints. A mismatch = 'HOST IDENTIFICATION CHANGED' — rebuilt server or impostor."
+  concepts: [known-hosts]
+  module: ssh
+
+- slug: card-key-permissions
+  front: "~/.ssh permissions"
+  back: "Directory 700, private keys 600 — SSH refuses otherwise (UNPROTECTED PRIVATE KEY FILE)."
+  concepts: [private-key]
+  module: ssh

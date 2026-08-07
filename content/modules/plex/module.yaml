@@ -1,0 +1,8 @@
+id: plex
+number: 6
+stage: 2
+title: Plex Fundamentals
+description: >
+  Media libraries, clients, direct play vs transcoding, and what Quick Sync buys you.
+lessons: []
+implemented: false

@@ -1,0 +1,8 @@
+id: postgresql
+number: 12
+stage: 3
+title: PostgreSQL and Relational Databases
+description: >
+  Tables, queries, indexes, transactions — structured data done properly.
+lessons: []
+implemented: false

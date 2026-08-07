@@ -1,0 +1,8 @@
+id: provenance
+number: 14
+stage: 4
+title: Provenance and Trust
+description: >
+  Claim → measurement → assay → sample → protocol → operator: scientific traceability as a data model.
+lessons: []
+implemented: false

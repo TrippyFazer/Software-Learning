@@ -16,14 +16,15 @@ Caddy  ── automatic HTTPS, security headers
         PostgreSQL (internal Docker network only)
 ```
 
-Four containers, one Compose file:
+Three containers, one Compose file (the "web" tier exists as a build stage,
+not a runtime process — the React bundle is compiled into the Caddy image by
+a multi-stage build, so no Node runs in production):
 
-| Container  | Image source            | Exposed to internet | Role |
-| ---------- | ----------------------- | ------------------- | ---- |
-| `caddy`    | `infra/docker/Caddyfile`| 80, 443             | TLS termination, routing, static files, security headers |
-| `web`      | build stage only        | no                  | Builds the React bundle into a shared volume for Caddy |
-| `api`      | `apps/api`              | no (internal :8000) | All application logic |
-| `postgres` | `postgres:16`           | **never**           | Learner state |
+| Container  | Image source                  | Exposed to internet | Role |
+| ---------- | ----------------------------- | ------------------- | ---- |
+| `caddy`    | `infra/docker/caddy.Dockerfile` (Node build stage → Caddy + bundle) | 80, 443 | TLS termination, routing, static files, security headers |
+| `api`      | `infra/docker/api.Dockerfile` | no (internal :8000) | All application logic |
+| `postgres` | `postgres:16`                 | **never**           | Learner state |
 
 ## Modular monolith
 

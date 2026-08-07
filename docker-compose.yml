@@ -1,0 +1,89 @@
+# Infrastructure Learning Lab — production/dev topology.
+#
+# Three containers:
+#   caddy    — TLS termination, security headers, static web bundle (built in),
+#              routes /api/* to the api container. The ONLY internet-facing service.
+#   api      — FastAPI modular monolith, non-root, internal port 8000.
+#   postgres — learner state. Internal network only; NEVER given a ports: mapping.
+#
+# This file is itself future course material (Docker module): note how the
+# named volume `pgdata` survives `docker compose down` + `up`, so container
+# removal never destroys learning progress. Only `down -v` deletes volumes —
+# never run that in production.
+
+name: learning-lab
+
+services:
+  caddy:
+    build:
+      context: .
+      dockerfile: infra/docker/caddy.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      # ":80" for local dev (plain HTTP); "learn.example.com" in production
+      # (Caddy then obtains TLS certificates automatically).
+      CADDY_SITE_ADDRESS: ${CADDY_SITE_ADDRESS:-:80}
+    volumes:
+      - caddy_data:/data      # TLS certificates — persist across rebuilds
+      - caddy_config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  api:
+    build:
+      context: apps/api
+      dockerfile: ../../infra/docker/api.Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Inside the container the curriculum is a read-only mount, regardless
+      # of what CONTENT_ROOT says in .env (which serves native dev).
+      CONTENT_ROOT: /app/content
+      POSTGRES_HOST: postgres
+    volumes:
+      - ./content:/app/content:ro
+    expose:
+      - "8000"                # internal network only — Caddy is the front door
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # urllib instead of curl: keeps the image free of extra packages.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging: *logging
+
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-learninglab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-learninglab}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Deliberately NO ports: mapping. The database is reachable only by
+    # containers on this compose network. See docs/SECURITY.md rule 4.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *logging
+
+volumes:
+  pgdata:        # learner state — the one volume that must never be casually deleted
+  caddy_data:
+  caddy_config:

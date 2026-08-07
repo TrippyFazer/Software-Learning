@@ -66,9 +66,9 @@ That boundary is deliberate — see ADR-0002 and ADR-0003.
 Prerequisites: Docker + Docker Compose, or natively `uv` + Node 22.
 
 ```bash
-cp .env.example .env        # then edit values
+cp .env.example .env        # then edit values (HTTP_PORT=8080 if 80 is taken)
 docker compose up --build
-# web:  http://localhost:8080
+# web:  http://localhost  (or http://localhost:$HTTP_PORT)
 ```
 
 Create the learner account (reads BOOTSTRAP_* from .env):

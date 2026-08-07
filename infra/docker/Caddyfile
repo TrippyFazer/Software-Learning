@@ -1,0 +1,39 @@
+# Caddy configuration for Infrastructure Learning Lab.
+#
+# CADDY_SITE_ADDRESS is ":80" in local dev (plain HTTP) and the real domain
+# (e.g. "learn.example.com") in production — with a domain, Caddy provisions
+# and renews TLS certificates automatically via Let's Encrypt.
+
+{$CADDY_SITE_ADDRESS::80} {
+	encode gzip
+
+	header {
+		# Only meaningful over HTTPS; browsers ignore it on plain HTTP dev.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		# Self-only scripts; no inline <script>. Lesson Markdown is rendered
+		# without raw-HTML pass-through, so content can't inject markup either.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"
+		-Server
+	}
+
+	# Backend API — everything under /api/* goes to the FastAPI container.
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# Everything else is the single-page app. Unknown paths fall through to
+	# index.html so client-side routing works on refresh/deep links.
+	handle {
+		root * /srv/www
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

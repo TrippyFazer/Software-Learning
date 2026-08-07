@@ -1,0 +1,43 @@
+# --- Secrets -----------------------------------------------------------------
+# Never commit real environment files. Only .env.example belongs in git.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+coverage.xml
+dist/
+build/
+*.egg-info/
+
+# --- Node --------------------------------------------------------------------
+node_modules/
+apps/web/dist/
+apps/web/coverage/
+.vite/
+*.tsbuildinfo
+
+# --- Operational ---------------------------------------------------------------
+backups/
+*.dump
+*.sql.gz
+logs/
+*.log
+
+# --- Editors / OS --------------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+!.vscode/extensions.json

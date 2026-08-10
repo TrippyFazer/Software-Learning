@@ -86,9 +86,16 @@ function ExercisePage({ slug }: { slug: string }) {
     },
   });
 
+  // A reset is a true fresh start: clears the terminal state AND the
+  // exercise's completion/mastery credit (recomputed from remaining
+  // evidence), then refetches — the start call rebuilds the initial VFS.
   const reset = useMutation({
-    mutationFn: () => api.post<TermState>(`/api/simterm/exercises/${slug}/reset`),
-    onSuccess: (next) => qc.setQueryData(["termstate", slug], next),
+    mutationFn: () => api.post("/api/learning/reset-item", { item_slug: slug }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["termstate", slug] });
+      void qc.invalidateQueries({ queryKey: ["progress"] });
+      void qc.invalidateQueries({ queryKey: ["mastery"] });
+    },
   });
 
   async function revealHint() {

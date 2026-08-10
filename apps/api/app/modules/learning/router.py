@@ -72,6 +72,24 @@ def lessons_progress(user: CurrentUser, db: Annotated[Session, Depends(get_db)])
     }
 
 
+# --- manual reset ------------------------------------------------------------
+
+class ResetItemIn(BaseModel):
+    item_slug: str
+
+
+@router.post("/reset-item")
+def reset_item(body: ResetItemIn, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+    """Learner-initiated do-over for one exercise or challenge: clears its
+    completion and terminal state, and recomputes affected mastery from the
+    remaining evidence."""
+    try:
+        service.reset_item(db, user.id, body.item_slug)
+    except service.UnknownQuestion as e:
+        raise HTTPException(404, "Unknown exercise or challenge") from e
+    return {"ok": True}
+
+
 # --- flashcards --------------------------------------------------------------
 
 class ReviewIn(BaseModel):

@@ -44,6 +44,20 @@ export default function Challenge() {
     },
   });
 
+  // Full do-over: clears completion, question answers, and terminal state,
+  // and recomputes mastery from the remaining evidence.
+  const fullReset = useMutation({
+    mutationFn: () => api.post("/api/learning/reset-item", { item_slug: slug }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["challstate", slug] });
+      void qc.invalidateQueries({ queryKey: ["challstatus", slug] });
+      void qc.invalidateQueries({ queryKey: ["progress"] });
+      void qc.invalidateQueries({ queryKey: ["mastery"] });
+      // remount question blocks so answered state clears
+      window.location.reload();
+    },
+  });
+
   if (!info || !state) return <p className="muted">loading…</p>;
 
   return (
@@ -83,9 +97,28 @@ export default function Challenge() {
           Diagnosis: {status?.questions_correct ?? 0}/{status?.questions_total ?? info.questions.length}{" "}
           questions answered correctly
         </span>
-        <button className="btn ghost" onClick={() => reset.mutate()} disabled={reset.isPending}>
-          Reset scenario
-        </button>
+        <span>
+          <button className="btn ghost" onClick={() => reset.mutate()} disabled={reset.isPending}>
+            Reset scenario
+          </button>{" "}
+          <button
+            className="btn ghost"
+            title="Erase this challenge's completion, answers, and mastery credit so you can earn it yourself"
+            disabled={fullReset.isPending}
+            onClick={() => {
+              if (
+                window.confirm(
+                  "Clear this challenge's completion, question answers, and mastery credit? " +
+                    "You'll start it from scratch.",
+                )
+              ) {
+                fullReset.mutate();
+              }
+            }}
+          >
+            Clear completion
+          </button>
+        </span>
       </div>
 
       <h2>Diagnosis questions</h2>

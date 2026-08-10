@@ -253,6 +253,96 @@ def due_flashcards(db: Session, user_id: int) -> list[str]:
     return due
 
 
+# --- manual reset ------------------------------------------------------------
+
+def reset_item(db: Session, user_id: int, item_slug: str) -> None:
+    """Wipe a single exercise or challenge back to never-attempted.
+
+    The attempt log is normally append-only (ADR-0003), but a deliberate
+    learner-initiated reset is the sanctioned exception — e.g. someone else
+    completed a challenge on your machine, or you want to re-earn it
+    honestly. This deletes the item's attempts (and, for a challenge, its
+    diagnosis-question attempts), removes the saved terminal state, and
+    REBUILDS mastery for the affected concepts from the evidence that
+    remains — scores drop back to whatever the surviving history supports.
+    """
+    from sqlalchemy import delete
+
+    from app.modules.learning.models import ExerciseState
+
+    idx = get_content_index()
+    challenge = idx.challenges.get(item_slug)
+    exercise = idx.exercises.get(item_slug)
+    if challenge is None and exercise is None:
+        raise UnknownQuestion(item_slug)
+
+    item_slugs = {item_slug}
+    concepts: set[str] = set()
+    if challenge is not None:
+        item_slugs |= {q.id for q in challenge.questions}
+        concepts |= set(challenge.concepts)
+        for q in challenge.questions:
+            concepts |= set(q.concepts)
+    if exercise is not None:
+        concepts |= set(exercise.concepts)
+
+    db.execute(
+        delete(Attempt).where(Attempt.user_id == user_id, Attempt.item_slug.in_(item_slugs))
+    )
+    db.execute(
+        delete(ExerciseState).where(
+            ExerciseState.user_id == user_id,
+            ExerciseState.exercise_slug.in_({item_slug, f"challenge:{item_slug}"}),
+        )
+    )
+    rebuild_mastery(db, user_id, concepts)
+
+
+def rebuild_mastery(db: Session, user_id: int, concept_slugs: set[str]) -> None:
+    """Recompute the named concepts' mastery records from first principles:
+    replay the surviving attempt log + lesson completions. Used after a
+    reset; also the proof that MasteryRecord is a cache, not a source of
+    truth (ADR-0003)."""
+    if not concept_slugs:
+        return
+    idx = get_content_index()
+    attempts = list(db.scalars(select(Attempt).where(Attempt.user_id == user_id)))
+    completed_lessons = {
+        p.lesson_slug
+        for p in db.scalars(
+            select(LessonProgress).where(
+                LessonProgress.user_id == user_id, LessonProgress.completed_at.isnot(None)
+            )
+        )
+    }
+    introduced: set[str] = set()
+    for lesson_slug in completed_lessons:
+        lesson = idx.lessons.get(lesson_slug)
+        if lesson:
+            introduced.update(lesson.meta.concepts)
+
+    for slug in concept_slugs:
+        record = _get_or_create_mastery(db, user_id, slug)
+        record.introduced = slug in introduced
+        record.quiz_correct = record.quiz_total = 0
+        record.exercise_passed = record.applied_passed = False
+        record.retention_correct = record.retention_total = 0
+        for a in attempts:
+            if slug not in (a.concept_slugs or []):
+                continue
+            if a.kind == AttemptKind.QUIZ:
+                record.quiz_total += 1
+                record.quiz_correct += 1 if a.correct else 0
+            elif a.kind == AttemptKind.EXERCISE and a.correct:
+                record.exercise_passed = True
+            elif a.kind == AttemptKind.CHALLENGE and a.correct:
+                record.applied_passed = True
+            elif a.kind == AttemptKind.RETENTION:
+                record.retention_total += 1
+                record.retention_correct += 1 if a.correct else 0
+        record.score = mastery.compute_score(record)
+
+
 # --- learning sessions & progress --------------------------------------------
 
 SESSION_GAP = timedelta(minutes=30)  # inactivity that splits two study sessions

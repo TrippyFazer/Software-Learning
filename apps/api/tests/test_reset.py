@@ -108,3 +108,83 @@ def test_reset_preserves_unrelated_evidence(auth_client, db_session):
 def test_reset_unknown_item_404(auth_client):
     res = auth_client.post("/api/learning/reset-item", json={"item_slug": "ghost/item"})
     assert res.status_code == 404
+
+
+def test_completed_items_lists_everything_resettable(auth_client):
+    empty = auth_client.get("/api/learning/completed-items").json()
+    assert empty == {"lessons": [], "exercises": [], "challenges": []}
+
+    auth_client.post("/api/learning/lessons/linux/filesystem/complete")
+    _complete_exercise(auth_client)
+    _complete_challenge(auth_client)
+
+    items = auth_client.get("/api/learning/completed-items").json()
+    assert [x["slug"] for x in items["lessons"]] == ["linux/filesystem"]
+    assert [x["slug"] for x in items["exercises"]] == ["linux/create-project-structure"]
+    assert [x["slug"] for x in items["challenges"]] == ["server-rookie"]
+    assert items["challenges"][0]["title"].startswith("SERVER ROOKIE")
+
+
+def test_reset_lesson_uncompletes_and_clears_quiz_history(auth_client, db_session):
+    auth_client.post("/api/learning/lessons/linux/filesystem/complete")
+    auth_client.post("/api/learning/answers", json={"question_id": "linux-fs-q3", "answer": "pwd"})
+    record = db_session.scalar(
+        select(MasteryRecord).where(MasteryRecord.concept_slug == "working-directory")
+    )
+    assert record.introduced and record.quiz_total == 1
+
+    res = auth_client.post("/api/learning/reset-lesson", json={"lesson_slug": "linux/filesystem"})
+    assert res.status_code == 200
+
+    db_session.expire_all()
+    progress = auth_client.get("/api/learning/lessons/progress").json()
+    assert "linux/filesystem" not in progress
+    record = db_session.scalar(
+        select(MasteryRecord).where(MasteryRecord.concept_slug == "working-directory")
+    )
+    assert record.introduced is False
+    assert record.quiz_total == 0
+    assert record.score == 0.0
+
+
+def test_reset_lesson_keeps_introduced_if_another_lesson_covers_concept(auth_client, db_session):
+    # "permission" is taught by users-and-permissions AND exercised by the boss;
+    # here: complete users-and-permissions, and verify un-completing a DIFFERENT
+    # lesson never touches it — while un-completing its own lesson clears it.
+    auth_client.post("/api/learning/lessons/linux/users-and-permissions/complete")
+    auth_client.post("/api/learning/lessons/linux/filesystem/complete")
+    auth_client.post("/api/learning/reset-lesson", json={"lesson_slug": "linux/filesystem"})
+
+    db_session.expire_all()
+    record = db_session.scalar(
+        select(MasteryRecord).where(MasteryRecord.concept_slug == "permission")
+    )
+    assert record.introduced is True  # untouched by the other lesson's reset
+
+
+def test_reset_all_requires_exact_phrase_and_wipes_everything(auth_client, db_session):
+    auth_client.post("/api/learning/lessons/linux/filesystem/complete")
+    _complete_exercise(auth_client)
+    auth_client.post(
+        "/api/learning/flashcards/review", json={"card_slug": "card-server", "correct": True}
+    )
+
+    # wrong phrase → refused, nothing changes
+    res = auth_client.post("/api/learning/reset-all", json={"confirm": "yes"})
+    assert res.status_code == 400
+    assert auth_client.get("/api/learning/progress").json()["lessons_completed"] == 1
+
+    res = auth_client.post("/api/learning/reset-all", json={"confirm": "reset everything"})
+    assert res.status_code == 200
+
+    p = auth_client.get("/api/learning/progress").json()
+    assert p["lessons_completed"] == 0
+    assert p["concepts_tracked"] == 0
+    assert p["due_flashcards"] == 0
+    assert auth_client.get("/api/learning/completed-items").json() == {
+        "lessons": [], "exercises": [], "challenges": [],
+    }
+    db_session.expire_all()
+    assert db_session.scalar(select(Attempt)) is None
+    assert db_session.scalar(select(MasteryRecord)) is None
+    assert db_session.scalar(select(ExerciseState)) is None

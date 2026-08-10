@@ -90,6 +90,42 @@ def reset_item(body: ResetItemIn, user: CurrentUser, db: Annotated[Session, Depe
     return {"ok": True}
 
 
+class ResetLessonIn(BaseModel):
+    lesson_slug: str
+
+
+@router.post("/reset-lesson")
+def reset_lesson(body: ResetLessonIn, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+    """Un-complete a lesson: progress marker and quiz history removed,
+    mastery rebuilt."""
+    try:
+        service.reset_lesson(db, user.id, body.lesson_slug)
+    except service.UnknownQuestion as e:
+        raise HTTPException(404, "Unknown lesson") from e
+    return {"ok": True}
+
+
+class ResetAllIn(BaseModel):
+    # The exact phrase the UI makes the learner type — a deliberate speed
+    # bump; this erases everything.
+    confirm: str
+
+
+@router.post("/reset-all")
+def reset_all(body: ResetAllIn, user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+    if body.confirm != "reset everything":
+        raise HTTPException(400, 'Confirmation phrase must be exactly "reset everything"')
+    service.reset_all(db, user.id)
+    return {"ok": True}
+
+
+@router.get("/completed-items")
+def completed_items(user: CurrentUser, db: Annotated[Session, Depends(get_db)]):
+    """Everything currently marked complete — powers the Progress page's
+    reset controls."""
+    return service.completed_items(db, user.id)
+
+
 # --- flashcards --------------------------------------------------------------
 
 class ReviewIn(BaseModel):

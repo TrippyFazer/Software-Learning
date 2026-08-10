@@ -298,6 +298,85 @@ def reset_item(db: Session, user_id: int, item_slug: str) -> None:
     rebuild_mastery(db, user_id, concepts)
 
 
+def reset_lesson(db: Session, user_id: int, lesson_slug: str) -> None:
+    """Un-complete a lesson: removes its progress marker and its quiz-answer
+    history, then rebuilds mastery for its concepts — 'introduced' credit
+    disappears unless another completed lesson still covers the concept."""
+    from sqlalchemy import delete
+
+    idx = get_content_index()
+    lesson = idx.lessons.get(lesson_slug)
+    if lesson is None:
+        raise UnknownQuestion(lesson_slug)
+
+    db.execute(
+        delete(LessonProgress).where(
+            LessonProgress.user_id == user_id, LessonProgress.lesson_slug == lesson_slug
+        )
+    )
+    if lesson.meta.quiz:
+        quiz = idx.quizzes[lesson.meta.quiz]
+        question_ids = [q.id for q in quiz.questions]
+        db.execute(
+            delete(Attempt).where(
+                Attempt.user_id == user_id, Attempt.item_slug.in_(question_ids)
+            )
+        )
+    rebuild_mastery(db, user_id, set(lesson.meta.concepts))
+
+
+def reset_all(db: Session, user_id: int) -> None:
+    """The full do-over: every attempt, mastery record, terminal state,
+    lesson completion, and flashcard state for this user. Deliberately NOT
+    exposed anywhere but behind a double confirmation in the UI."""
+    from sqlalchemy import delete
+
+    from app.modules.learning.models import ExerciseState
+
+    for model in (Attempt, MasteryRecord, ExerciseState, LessonProgress, FlashcardState):
+        db.execute(delete(model).where(model.user_id == user_id))
+
+
+def completed_items(db: Session, user_id: int) -> dict:
+    """Everything currently marked complete, shaped for the Progress page's
+    reset controls."""
+    idx = get_content_index()
+    completed_lessons = [
+        p.lesson_slug
+        for p in db.scalars(
+            select(LessonProgress).where(
+                LessonProgress.user_id == user_id, LessonProgress.completed_at.isnot(None)
+            )
+        )
+    ]
+    passed_slugs = {
+        a.item_slug
+        for a in db.scalars(
+            select(Attempt).where(
+                Attempt.user_id == user_id,
+                Attempt.kind.in_([AttemptKind.EXERCISE, AttemptKind.CHALLENGE]),
+                Attempt.correct.is_(True),
+            )
+        )
+    }
+    lessons = [
+        {"slug": s, "title": idx.lessons[s].meta.title}
+        for s in sorted(completed_lessons)
+        if s in idx.lessons
+    ]
+    exercises = [
+        {"slug": s, "title": idx.exercises[s].title}
+        for s in sorted(passed_slugs)
+        if s in idx.exercises
+    ]
+    challenges = [
+        {"slug": s, "title": idx.challenges[s].title}
+        for s in sorted(passed_slugs)
+        if s in idx.challenges
+    ]
+    return {"lessons": lessons, "exercises": exercises, "challenges": challenges}
+
+
 def rebuild_mastery(db: Session, user_id: int, concept_slugs: set[str]) -> None:
     """Recompute the named concepts' mastery records from first principles:
     replay the surviving attempt log + lesson completions. Used after a

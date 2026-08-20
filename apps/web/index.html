@@ -10,7 +10,12 @@
 
     <!-- Installability. The manifest is what turns a page into something the
          operating system will give an icon and its own window. -->
-    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- crossorigin="use-credentials" is REQUIRED here, not decorative.
+         A manifest is fetched with credentials OMITTED by default. The site
+         sits behind HTTP basic auth at the edge, so the default fetch gets a
+         401, the manifest never loads, and the app is silently not
+         installable — with no error anywhere the user would look. -->
+    <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <!-- iOS ignores the manifest's icons entirely and uses this one. Without
          it, "Add to Home Screen" produces a blurry screenshot as the icon. -->

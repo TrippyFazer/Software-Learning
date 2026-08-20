@@ -22,8 +22,9 @@ LEARN → VISUALIZE → PRACTICE → MAKE A MISTAKE → UNDERSTAND WHY
   the host (see [docs/SECURITY.md](docs/SECURITY.md)).
 - Mastery is tracked per **concept**, with transparent, explainable scoring —
   not "lesson completed = learned".
-- **Content shipped:** Modules 0–3 (Systems, Linux, Networking, SSH) and
-  Module 8 (Docker), plus the Stage 1 boss challenge.
+- **Content shipped:** Modules 0–5 (Systems, Linux, Networking, SSH, Storage,
+  Server Hardware) and Module 8 (Docker), plus the Stage 1 boss challenge —
+  21 lessons, 21 quizzes, 11 terminal exercises.
 - **Works on a plane.** Lessons, vocabulary and flashcards are downloadable to
   the device and the app installs like a native one; anything you complete
   offline is queued and synced on reconnect. Terminal exercises need the

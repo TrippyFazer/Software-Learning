@@ -1,0 +1,78 @@
+id: storage/disks-partitions-filesystems
+questions:
+  - id: stor-layout-q1
+    type: multiple_choice
+    concepts: [block-device, partition, filesystem-format]
+    prompt: Put the four layers in order, from the physical device upward.
+    options:
+      - filesystem → partition → disk → mount point
+      - disk → partition → filesystem → mount point
+      - mount point → filesystem → disk → partition
+      - partition → disk → mount point → filesystem
+    answer_index: 1
+    explanation: >
+      A disk is divided into partitions; a filesystem is written into a
+      partition; the filesystem is mounted at a directory. Each layer is
+      meaningless without the one below it.
+
+  - id: stor-layout-q2
+    type: multiple_choice
+    concepts: [mount-point]
+    prompt: >
+      `/boot/efi` is a separate vfat partition. Which filesystem does
+      `/boot/efi/grub.cfg` live on?
+    options:
+      - The root filesystem, because /boot/efi is inside /
+      - The vfat filesystem — a path belongs to the longest matching mount
+      - Both, mirrored automatically
+      - Neither; /boot/efi is in memory
+    answer_index: 1
+    explanation: >
+      Longest matching mount wins. `/boot/efi` is a longer match than `/`, so
+      everything beneath it belongs to the vfat filesystem. `df <path>` is how
+      you check this on a real machine.
+
+  - id: stor-layout-q3
+    type: multiple_choice
+    concepts: [mount-point]
+    prompt: >
+      You write files into `/mnt/data`, then mount a disk there. What
+      happened to the files?
+    options:
+      - They were copied onto the new disk
+      - They were deleted when the disk mounted
+      - They are hidden beneath the mount, still using space on the root filesystem
+      - The mount fails because the directory is not empty
+    answer_index: 2
+    explanation: >
+      Mounting hides, it does not delete. The files still occupy space on `/`
+      and reappear if you unmount. This is a classic cause of a mysteriously
+      full root filesystem.
+
+  - id: stor-layout-q4
+    type: multiple_choice
+    concepts: [block-device]
+    prompt: Which command answers "what physical devices and partitions exist on this machine?"
+    options:
+      - df -h
+      - du -sh /
+      - lsblk
+      - ls /dev
+    answer_index: 2
+    explanation: >
+      `lsblk` lists block devices and their partitions as a tree. `df` reports
+      free space per mounted filesystem, and `mount` shows what is attached
+      where — three different questions.
+
+  - id: stor-layout-q5
+    type: text
+    concepts: [filesystem-format]
+    prompt: >
+      Why must the EFI partition be formatted vfat rather than ext4?
+      (One phrase.)
+    accept: ["firmware can only read fat", "uefi only reads fat", "the firmware cannot read ext4",
+             "uefi firmware only understands fat", "firmware only understands fat", "uefi requires fat"]
+    explanation: >
+      UEFI firmware runs before Linux exists and can only read FAT. The
+      bootloader therefore has to live on a filesystem the firmware
+      understands.

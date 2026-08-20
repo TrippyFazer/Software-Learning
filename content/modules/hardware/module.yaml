@@ -3,6 +3,10 @@ number: 5
 stage: 2
 title: Server Hardware
 description: >
-  CPU, RAM, storage tiers, and NICs — what the spec sheets actually mean for your workloads.
-lessons: []
-implemented: false
+  CPU, memory, and what a spec sheet actually means — read off the
+  machine you are already running. Why 2 vCPU and 3.7 GB shapes real
+  decisions, and what happens the moment you ask for more than you have.
+lessons:
+  - cpu-and-memory
+  - when-a-machine-runs-out
+implemented: true

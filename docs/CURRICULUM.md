@@ -1,12 +1,14 @@
 # Curriculum
 
-The complete learning sequence. **Modules 0–3** (plus the Stage 1 boss
-challenge) and **Module 8 — Docker** ship with content; everything else is
-planned structure.
+The complete learning sequence. **Modules 0–5** and **Module 8 — Docker**
+ship with content, plus the Stage 1 boss challenge; everything else is planned
+structure.
 
 Module 8 was written out of sequence, deliberately: the learner runs Docker
 daily on the server this Lab is deployed to, and the module is taught from
-that server's own compose files. Relevance beats numbering.
+that server's own compose files. Relevance beats numbering. Modules 4 and 5
+followed and are taught from the same machine — its real 77 GB disk, its real
+2 vCPU and 3.7 GB.
 
 Every module teaches toward two real systems the learner is building:
 **Brain Core** (personal/organizational intelligence platform) and a
@@ -54,12 +56,12 @@ working. Given filesystem state, processes, disk usage, service state, and
 logs, diagnose the problem. Requires combining Stage 1 concepts; the answer
 is never named in the prompt.
 
-### Stage 2 — Infrastructure (Module 8 ✅)
+### Stage 2 — Infrastructure (Modules 4, 5, 8 ✅)
 
 | # | Module | Focus |
 |---|--------|-------|
-| 4 | Storage Fundamentals | disks, partitions, filesystems, mounts, RAID concepts |
-| 5 | Server Hardware | CPU, RAM, storage tiers, NICs, what specs actually mean |
+| 4 | Storage Fundamentals ✅ | disks, partitions, filesystems, mounts, df/du, inodes, RAID vs backup. 3 lessons, 15 quiz questions, the disk-is-full drill |
+| 5 | Server Hardware ✅ | vCPU vs core vs thread, reading `free`, the OOM killer, swap, memory limits. 2 lessons, 10 quiz questions, a sizing exercise |
 | 6 | Plex Fundamentals | media libraries, clients, streaming vs transcoding |
 | 7 | Virtualization and Proxmox | VMs, hypervisors, containers vs VMs |
 | 8 | Docker ✅ | images, containers, volumes, networks, Compose — taught from *this app's own* Compose file and Task OS's. 4 lessons, 20 quiz questions, 3 terminal exercises |

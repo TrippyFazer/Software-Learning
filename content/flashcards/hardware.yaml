@@ -1,0 +1,36 @@
+# Module 5 flashcards
+- slug: card-vcpu
+  front: Does "2 vCPU" mean two cores?
+  back: "Usually not. One vCPU is normally one hardware THREAD. A 2 vCPU t3.medium is one physical core with SMT — lscpu shows Core(s) per socket 1, Thread(s) per core 2."
+  concepts: [vcpu, core-vs-thread]
+  module: hardware
+
+- slug: card-buff-cache
+  front: "`free -h` shows 200Mi free out of 3.7Gi. Is the machine out of memory?"
+  back: "Almost certainly not. Most of it is buff/cache — reclaimable disk cache the kernel returns on demand. Read the `available` column; unused RAM is wasted RAM."
+  concepts: [page-cache, ram]
+  module: hardware
+
+- slug: card-cpu-vs-io
+  front: Why can 2 vCPUs serve many concurrent web requests?
+  back: "Most web work is I/O-bound — waiting on a database or network costs almost no CPU. What saturates a small machine is CPU-bound work: builds, transcodes, embedding generation."
+  concepts: [vcpu]
+  module: hardware
+
+- slug: card-oom
+  front: A container restarted with nothing in its logs. Exit code 137. What happened?
+  back: "The OOM killer SIGKILLed it — 137 is 128+9. SIGKILL cannot be caught, so the application never logged a shutdown. `journalctl -k | grep -i oom` names the victim."
+  concepts: [oom-killer]
+  module: hardware
+
+- slug: card-swap
+  front: What does adding swap actually buy you?
+  back: "It converts a sudden out-of-memory kill into a slow degradation, by pushing idle pages to disk. It adds no capacity — a machine actively swapping its working set is effectively down."
+  concepts: [swap]
+  module: hardware
+
+- slug: card-memlimit
+  front: Why do the app containers have mem_limit but the shared Caddy does not?
+  back: "A limit bounds the blast radius to one application. Caddy is the front door for every site — OOM-killing it takes everything down at once, so it is deliberately unlimited."
+  concepts: [memory-limit]
+  module: hardware

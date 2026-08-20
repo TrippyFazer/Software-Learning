@@ -1,0 +1,78 @@
+id: hardware/cpu-and-memory
+questions:
+  - id: hw-cpu-q1
+    type: multiple_choice
+    concepts: [vcpu, core-vs-thread]
+    prompt: >
+      `nproc` prints 2. `lscpu` shows "Core(s) per socket: 1" and
+      "Thread(s) per core: 2". How much genuinely parallel work can this
+      machine do?
+    options:
+      - Two full cores' worth
+      - Roughly one core's worth, with a modest gain from SMT
+      - Four threads' worth
+      - It depends entirely on RAM
+    answer_index: 1
+    explanation: >
+      Both outputs are true and answer different questions. There is one
+      physical core; the second thread helps when the first stalls, but it is
+      not a second core. This is why the API runs 2 workers, not 8.
+
+  - id: hw-cpu-q2
+    type: multiple_choice
+    concepts: [page-cache]
+    prompt: >
+      `free -h` shows total 3.7Gi, used 1.5Gi, free 200Mi, buff/cache 2.1Gi,
+      available 2.3Gi. Which number tells you how much a new process could get?
+    options:
+      - free — 200Mi
+      - buff/cache — 2.1Gi
+      - available — 2.3Gi
+      - total minus used — 2.2Gi
+    answer_index: 2
+    explanation: >
+      `available` is the kernel's own estimate, and it accounts for the fact
+      that buff/cache is reclaimable. Reading `free` instead is the most common
+      false alarm on Linux.
+
+  - id: hw-cpu-q3
+    type: multiple_choice
+    concepts: [ram, vcpu]
+    prompt: What is the practical difference between running out of CPU and running out of RAM?
+    options:
+      - Both cause processes to be killed
+      - Too little CPU is slow; too little RAM gets a process killed
+      - Too little RAM is slow; too little CPU gets a process killed
+      - Neither matters if there is swap
+    answer_index: 1
+    explanation: >
+      CPU pressure lengthens a queue — everything gets slower but survives.
+      Memory pressure ends with the kernel killing something, with no warning
+      and nothing in the application's log.
+
+  - id: hw-cpu-q4
+    type: multiple_choice
+    concepts: [memory-limit]
+    prompt: Why does the shared Caddy deliberately have no memory limit?
+    options:
+      - Caddy cannot be limited
+      - Caddy is the front door for every site — OOM-killing it takes everything down at once
+      - It uses almost no memory, so a limit would be pointless
+      - Limits only work on databases
+    answer_index: 1
+    explanation: >
+      A limit is for bounding a blast radius to one application. On the shared
+      proxy the blast radius is every site, so a limit would convert a
+      single-app problem into a total outage.
+
+  - id: hw-cpu-q5
+    type: text
+    concepts: [vcpu]
+    prompt: >
+      One word for the kind of work that actually saturates a small server —
+      builds, transcodes, embedding generation — as opposed to waiting on a
+      database. ("____-bound")
+    accept: [cpu, "cpu-bound", "cpu bound", compute, "compute-bound"]
+    explanation: >
+      CPU-bound. I/O-bound work spends its time waiting, which costs almost
+      nothing; CPU-bound work takes everything the machine has.

@@ -19,7 +19,7 @@ for execution only.
 
 import shlex
 
-from app.modules.simterm import docker_sim
+from app.modules.simterm import docker_sim, machine_sim
 from app.modules.simterm.vfs import USERNAME, VfsError, VirtualFileSystem
 
 MAX_LINE_LENGTH = 500
@@ -149,11 +149,14 @@ def _ls(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
         if "l" in flags:
             for name, node in entries:
                 prefix = "d" if node["type"] == "dir" else "-"
-                size = len(node.get("content", "")) if node["type"] == "file" else 4096
+                # Apparent size, so a scenario's 6 GB log reads as 6 GB here
+                # too — `ls -lh` is how people actually find the culprit.
+                size = machine_sim.node_size_bytes(node)
+                shown = machine_sim.human(size) if "h" in flags else str(size)
                 display = name + ("/" if node["type"] == "dir" else "")
                 lines.append(
                     f"{prefix}{vfs.mode_string(node)} 1 {node['owner']} {node['owner']} "
-                    f"{size:>6} Aug  7 12:00 {display}"
+                    f"{shown:>6} Aug  7 12:00 {display}"
                 )
         else:
             lines.extend(
@@ -306,6 +309,16 @@ def _execute_file(vfs: VirtualFileSystem, path: str) -> CommandResult:
     return CommandResult(lines)
 
 
+def _machine(fn):
+    """Adapt a machine_sim function to the CommandResult protocol."""
+
+    def handler(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
+        lines, ok = fn(vfs, args)
+        return CommandResult(lines, ok)
+
+    return handler
+
+
 def _docker(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
     """`docker ...` — handed to the simulated engine in docker_sim.
 
@@ -333,4 +346,13 @@ _HANDLERS = {
     "help": _help,
     "clear": _clear,
     "docker": _docker,
+    # Module 4/5: inspecting the machine. df and du are computed from the
+    # virtual filesystem, so deleting a big file really does free space.
+    "df": _machine(machine_sim.df),
+    "du": _machine(machine_sim.du),
+    "lsblk": _machine(machine_sim.lsblk),
+    "mount": _machine(machine_sim.mount_cmd),
+    "free": _machine(machine_sim.free),
+    "nproc": _machine(machine_sim.nproc),
+    "lscpu": _machine(machine_sim.lscpu),
 }

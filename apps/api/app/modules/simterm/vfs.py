@@ -33,8 +33,9 @@ def make_file(
     mode: str = "644",
     exec_output: str | None = None,
     exec_creates: dict | None = None,
+    size_mb: int | None = None,
 ) -> dict:
-    return {
+    node = {
         "type": "file",
         "mode": mode,
         "owner": USERNAME,
@@ -42,10 +43,21 @@ def make_file(
         "exec_output": exec_output,
         "exec_creates": exec_creates or {},
     }
+    # Apparent size, for storage lessons. A "6 GB log file" must weigh 6 GB to
+    # df and du without the exercise shipping six gigabytes of text.
+    if size_mb:
+        node["size_mb"] = size_mb
+    return node
 
 
 class VirtualFileSystem:
-    def __init__(self, root: dict | None = None, cwd: str = HOME, docker: dict | None = None):
+    def __init__(
+        self,
+        root: dict | None = None,
+        cwd: str = HOME,
+        docker: dict | None = None,
+        machine: dict | None = None,
+    ):
         self.root = root or self._default_root()
         self.cwd = cwd
         # Simulated Docker engine state (images/containers/volumes/networks),
@@ -54,6 +66,9 @@ class VirtualFileSystem:
         # docker_sim owns its shape, and this module stays a filesystem.
         # It rides in the same JSON column, so no migration was needed.
         self.docker = docker if docker is not None else {}
+        # Simulated hardware and disks (machine_sim). Same reasoning as
+        # `docker`: not a filesystem concept, same JSON column, no migration.
+        self.machine = machine if machine is not None else {}
 
     # --- construction / serialization ---------------------------------------
 
@@ -83,13 +98,19 @@ class VirtualFileSystem:
                 node["children"][name] = make_file(
                     content=spec.content,
                     mode=spec.mode,
+                    size_mb=spec.size_mb,
                     exec_output=spec.exec_output,
                     exec_creates=spec.exec_creates,
                 )
         return vfs
 
     def to_dict(self) -> dict:
-        return {"root": self.root, "cwd": self.cwd, "docker": self.docker}
+        return {
+            "root": self.root,
+            "cwd": self.cwd,
+            "docker": self.docker,
+            "machine": self.machine,
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> "VirtualFileSystem":
@@ -107,6 +128,7 @@ class VirtualFileSystem:
             root=copy.deepcopy(data["root"]),
             cwd=data["cwd"],
             docker=copy.deepcopy(data.get("docker") or {}),
+            machine=copy.deepcopy(data.get("machine") or {}),
         )
 
     # --- path handling -------------------------------------------------------

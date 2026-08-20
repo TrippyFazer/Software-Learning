@@ -1,0 +1,68 @@
+id: hardware/size-the-limits
+title: "Mission: Size the Limits"
+mission: |
+  A colleague has handed you a compose file for a new service to run on
+  **this** machine — the one you are logged into. It has no memory
+  limits at all. Two applications are already running here.
+
+  1. **Read the machine.** `nproc`, `lscpu`, `free -h`.
+     Note what `available` says, and note how many *physical* cores you
+     actually have.
+  2. **Read the file.** `cd newapp` then `cat docker-compose.yml`.
+     Two services: an API and a worker that generates embeddings.
+  3. **Decide.** There is no single right answer, but there is a
+     defensible one. You have roughly 2.3 GB available with the existing
+     applications running. The worker is the CPU- and memory-hungry one;
+     the API mostly waits on I/O.
+  4. **Write it down.** Record your reasoning:
+
+     `echo 'available: 2.3Gi, 1 physical core' > sizing.md`
+
+     Then add a line for each service and why.
+  5. **Apply it.** Rewrite `docker-compose.yml` with a `mem_limit` on
+     both services. Keep the total comfortably under what is available —
+     limits that add up to more than the machine has protect nobody.
+
+  You are done when both services carry a `mem_limit` and `sizing.md`
+  explains the numbers you chose.
+
+  **Worth remembering while you do it:** a limit does not create memory.
+  It guarantees that a misbehaving service is killed before it starves
+  the ones you care about.
+concepts:
+  - memory-limit
+  - ram
+  - vcpu
+cwd: /home/learner
+initial_files:
+  /home/learner/newapp: null
+  /home/learner/newapp/docker-compose.yml:
+    content: |
+      name: newapp
+
+      services:
+        api:
+          image: myorg/newapp-api:2.0
+          ports:
+            - "9000:8000"
+
+        embedder:
+          image: myorg/newapp-embedder:2.0
+    mode: "644"
+goal:
+  - type: file_contains
+    path: /home/learner/newapp/docker-compose.yml
+    text: "mem_limit"
+    description: "The compose file sets memory limits"
+  - type: file_exists
+    path: /home/learner/newapp/sizing.md
+    description: "sizing.md records the reasoning behind the numbers"
+  - type: file_contains
+    path: /home/learner/newapp/sizing.md
+    text: "available"
+    description: "The reasoning refers to what the machine actually had available"
+hints:
+  - "`free -h` — the column that matters is `available`, not `free`. `lscpu` will tell you there is one physical core behind the two vCPUs."
+  - "Without an editor, rebuild the file with echo and >>. Check it with `cat` as you go."
+  - "A defensible split: the embedder is the hungry one and the API mostly waits on I/O — so something like embedder 1g, api 384m. What matters is that the total leaves headroom, and that you can say why."
+  - "`echo 'embedder 1g: CPU/memory-hungry, bounded so it cannot starve the databases' >> sizing.md`"

@@ -1,0 +1,75 @@
+id: storage/disk-is-full
+title: "Mission: The Disk Is Full"
+mission: |
+  2:14am. A web application has stopped responding. It is not down —
+  the process is running — but every write fails and the logs stopped
+  updating an hour ago. You have a shell.
+
+  Run the drill. Do not guess, and do not delete anything you have not
+  looked at first.
+
+  1. **That.** `df -h` — which filesystem is full, and how full?
+  2. **Where.** Narrow down, one level at a time:
+     `du -h /var` … then into whatever is biggest … then into that.
+  3. **Confirm.** `ls -lh` the file you suspect before removing it.
+     A number on screen beats a hunch at 2am.
+  4. **Fix.** Remove it.
+  5. **Prove it.** `df -h` again. If the percentage has not moved, the
+     file is still held open by a running process — and that would be
+     the real lesson.
+
+  There is also a directory of old backups nobody rotated. Removing
+  `/var/backups/old` is fair game once you have seen what is in it.
+
+  You are done when `/` is back under 60% and the huge log is gone.
+concepts:
+  - disk-usage
+  - filesystem-format
+cwd: /home/learner
+initial_files:
+  /var/log: null
+  /var/log/webapp: null
+  /var/log/webapp/access.log:
+    content: "10.0.0.4 - - [20/Aug/2026:02:11:04] GET / 200\n"
+    size_mb: 41000
+    mode: "644"
+  /var/log/webapp/error.log:
+    content: "level=error msg=\"disk write failed\"\n"
+    size_mb: 12
+    mode: "644"
+  /var/log/syslog:
+    content: "Aug 20 02:11:00 host kernel: EXT4-fs warning: filesystem full\n"
+    size_mb: 40
+    mode: "644"
+  /var/backups: null
+  /var/backups/old: null
+  /var/backups/old/db-2025-11-01.sql.gz:
+    content: "(simulated dump)"
+    size_mb: 9000
+    mode: "600"
+  /var/backups/old/db-2025-12-01.sql.gz:
+    content: "(simulated dump)"
+    size_mb: 9400
+    mode: "600"
+  /home/learner/NOTES.txt:
+    content: |
+      Handover notes
+      --------------
+      access.log has never been rotated. There is a ticket for it.
+      /var/backups/old predates the current backup script and is unused.
+    mode: "644"
+goal:
+  - type: path_absent
+    path: /var/log/webapp/access.log
+    description: "The runaway access.log is gone"
+  - type: file_exists
+    path: /var/log/webapp/error.log
+    description: "error.log is still there — you did not clear the whole directory"
+  - type: file_exists
+    path: /var/log/syslog
+    description: "syslog is still there — targeted, not scorched earth"
+hints:
+  - "`df -h` first. Look at the Use% column for `/`. Then `du -h /var` to see which directory under /var is responsible."
+  - "`du -h /var/log/webapp` will point straight at it. Confirm with `ls -lh /var/log/webapp` before you remove anything."
+  - "`rm /var/log/webapp/access.log`, then `df -h` again — the percentage should drop by a lot. Read ~/NOTES.txt if you want to know whether /var/backups/old is safe to remove too."
+  - "Deleting everything under /var/log would also free the space and would be the wrong answer: error.log and syslog are the evidence you would need in the morning."

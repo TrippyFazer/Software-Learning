@@ -1,0 +1,82 @@
+id: storage/space-and-what-eats-it
+questions:
+  - id: stor-full-q1
+    type: multiple_choice
+    concepts: [disk-usage]
+    prompt: Which command tells you WHICH filesystem is full, and which tells you WHERE the space went?
+    options:
+      - du first, then df
+      - df tells you which is full; du tells you where the space went
+      - Both do the same thing
+      - ls -lh for both
+    answer_index: 1
+    explanation: >
+      `df` asks each filesystem for its own accounting — fast and
+      authoritative. `du` walks the tree summing files. Always df first, then
+      narrow with du.
+
+  - id: stor-full-q2
+    type: multiple_choice
+    concepts: [disk-usage]
+    prompt: >
+      `du` reports 12 GB used, `df` reports 60 GB used, on the same
+      filesystem. What is the most likely explanation?
+    options:
+      - du is more accurate; df includes reserved blocks
+      - A file was deleted while a process still had it open
+      - The filesystem is corrupt
+      - Hidden files are excluded from du
+    answer_index: 1
+    explanation: >
+      Unlinking removes the NAME; the blocks stay allocated until the last
+      open handle closes. `du` walks names, so it cannot see it. `df` asks the
+      filesystem, which is still holding the space. Restart the process.
+
+  - id: stor-full-q3
+    type: multiple_choice
+    concepts: [inode]
+    prompt: >
+      A service reports "No space left on device", but `df -h` shows 40 GB
+      available. What should you check?
+    options:
+      - df -i — the filesystem may be out of inodes
+      - The disk is failing
+      - Swap usage
+      - Permissions on the target directory
+    answer_index: 0
+    explanation: >
+      Inodes are a fixed resource set at format time, one per file. Millions of
+      small files can exhaust them while bytes remain. `df -i` shows inode
+      usage.
+
+  - id: stor-full-q4
+    type: multiple_choice
+    concepts: [disk-usage]
+    prompt: >
+      On this Docker host, which cleanup command is explicitly forbidden by
+      the server's operating rules?
+    options:
+      - docker image prune
+      - docker system prune / docker volume prune
+      - docker logs
+      - docker compose up -d
+    answer_index: 1
+    explanation: >
+      `system prune` and `volume prune` reach past dangling images and can take
+      volumes — which is to say databases. `docker image prune` reclaims
+      dangling layers and is the safe one to reach for.
+
+  - id: stor-full-q5
+    type: multiple_choice
+    concepts: [disk-usage]
+    prompt: You have deleted the culprit file. What is the last step of the drill?
+    options:
+      - Reboot the server
+      - Run `du` again on the parent directory
+      - Re-run `df -h` and confirm the number actually moved
+      - Delete the backups to make room
+    answer_index: 2
+    explanation: >
+      Confirming with `df` is the step people skip, and it is the only one that
+      proves the fix. If the number has not moved, the file is still held open
+      by a running process.

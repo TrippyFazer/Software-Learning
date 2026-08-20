@@ -1,0 +1,82 @@
+id: hardware/when-a-machine-runs-out
+questions:
+  - id: hw-oom-q1
+    type: multiple_choice
+    concepts: [oom-killer]
+    prompt: >
+      A container restarted an hour ago. Its application log ends
+      mid-request with no shutdown message. `docker inspect` shows exit
+      code 137. What happened?
+    options:
+      - The application crashed and logged nothing due to a bug
+      - The OOM killer SIGKILLed it — 137 is 128+9
+      - Docker restarted it because the healthcheck failed
+      - The disk filled up
+    answer_index: 1
+    explanation: >
+      137 is the fingerprint of SIGKILL. It cannot be caught, so there is no
+      shutdown log by definition. `journalctl -k | grep -i oom` on the host
+      names the victim.
+
+  - id: hw-oom-q2
+    type: multiple_choice
+    concepts: [swap]
+    prompt: What does adding swap to a memory-starved machine actually achieve?
+    options:
+      - It adds real capacity, equivalent to more RAM
+      - It converts a sudden kill into a slow degradation, at a large speed cost
+      - It prevents the OOM killer from ever running
+      - It has no effect on modern kernels
+    answer_index: 1
+    explanation: >
+      Swap lets the kernel evict idle pages to disk instead of killing
+      something. On cloud storage it is orders of magnitude slower than RAM —
+      a machine actively swapping its working set is effectively down.
+
+  - id: hw-oom-q3
+    type: multiple_choice
+    concepts: [memory-limit]
+    prompt: >
+      A container has been OOM-killed three times this week. It ran fine for
+      months. What should you look at first?
+    options:
+      - Raise the memory limit immediately
+      - Remove the limit entirely
+      - Look at the memory trend — a limit that was fine for months usually means a leak
+      - Add more swap
+    answer_index: 2
+    explanation: >
+      Sometimes the limit really was too small. Just as often, raising it
+      converts a contained failure into a machine-wide one, and the next victim
+      is the database. A limit that used to be fine points at a leak.
+
+  - id: hw-oom-q4
+    type: multiple_choice
+    concepts: [memory-limit]
+    prompt: >
+      Why does the frontend build stage set
+      `NODE_OPTIONS=--max-old-space-size=768`?
+    options:
+      - Node runs faster with a smaller heap
+      - It is required by Vite
+      - An uncapped build on a 3.7 GB shared box can take the whole machine down while doing non-production work
+      - It reduces the size of the built bundle
+    answer_index: 2
+    explanation: >
+      A build is a spike of CPU and memory on a machine already running two
+      applications. Capping it makes the build fail predictably instead of
+      killing the database.
+
+  - id: hw-oom-q5
+    type: multiple_choice
+    concepts: [oom-killer]
+    prompt: Which command shows how close each container is to its memory limit right now?
+    options:
+      - docker ps -a
+      - docker stats --no-stream
+      - docker logs
+      - free -h
+    answer_index: 1
+    explanation: >
+      `docker stats` shows per-container memory against the limit. A container
+      sitting at 95% of its limit is one busy request away from exit code 137.

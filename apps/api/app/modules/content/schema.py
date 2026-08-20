@@ -148,6 +148,9 @@ class VfsFileSpec(BaseModel):
     content: str = ""
     mode: str = "644"                # octal string; dirs default to 755
     owner: str = "learner"
+    # Apparent size in MB, for storage exercises. df/du report this instead of
+    # the content length, so a scenario can ship a 6 GB log file cheaply.
+    size_mb: int | None = None
     # "Scripts": when the file is executed (./name, requires the x bit) the
     # simulator prints exec_output and creates exec_creates files. This powers
     # failure-driven lessons — no real execution is ever involved.

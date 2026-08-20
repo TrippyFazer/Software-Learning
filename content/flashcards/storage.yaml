@@ -1,0 +1,54 @@
+# Module 4 flashcards
+- slug: card-block-device
+  front: What is a block device, and what does it know about files?
+  back: "A device the kernel addresses in fixed-size blocks — /dev/nvme0n1. It knows nothing about files. Files are structure a FILESYSTEM writes into those blocks."
+  concepts: [block-device, filesystem-format]
+  module: storage
+
+- slug: card-partition-vs-filesystem
+  front: Partition vs filesystem
+  back: "A partition is a declared RANGE OF BLOCKS on a disk. A filesystem is the STRUCTURE written into those blocks (ext4, vfat). One is where, the other is how."
+  concepts: [partition, filesystem-format]
+  module: storage
+
+- slug: card-mount-point
+  front: Which filesystem does /boot/efi/grub.cfg live on?
+  back: "The one mounted at /boot/efi — a path belongs to the LONGEST matching mount, not to /. Mounting also hides anything already in that directory, without deleting it."
+  concepts: [mount-point]
+  module: storage
+
+- slug: card-df-vs-du
+  front: df vs du — and what does it mean when they disagree?
+  back: "df asks the filesystem (that you are full); du walks the tree (where it went). If df says far more than du, a deleted file is still held open by a running process — the name is gone, the blocks are not. Restart that process."
+  concepts: [disk-usage]
+  module: storage
+
+- slug: card-deleted-but-open
+  front: You delete a 60 GB log and df does not change. Why?
+  back: "The application still has the file open. Unlinking removes the name; the blocks stay allocated until the last file handle closes. Restart or signal the process holding it."
+  concepts: [disk-usage]
+  module: storage
+
+- slug: card-inode
+  front: "\"No space left on device\" with 40 GB free — what happened?"
+  back: "You ran out of INODES, not bytes. A filesystem has a fixed number, one per file, set when it was formatted. Millions of tiny files exhaust them. Diagnose with df -i."
+  concepts: [inode]
+  module: storage
+
+- slug: card-raid-not-backup
+  front: Why is RAID not a backup?
+  back: "RAID protects against a DISK dying and keeps the machine serving. It replicates every write — including your rm -rf and every corrupt byte — instantly and correctly. It is availability, not history."
+  concepts: [raid, backup]
+  module: storage
+
+- slug: card-3-2-1
+  front: The 3-2-1 rule
+  back: "Three copies of the data, on two different kinds of media, with one off-site. A copy on the same disk shares a fate with the original."
+  concepts: [backup]
+  module: storage
+
+- slug: card-restore-test
+  front: What is the only proof that a backup works?
+  back: "A restore you actually performed — into a scratch database, with row counts and the newest timestamp checked. 'The job ran' and 'the file exists' are not evidence; every failure mode here is silent."
+  concepts: [restore-test, backup]
+  module: storage

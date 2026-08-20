@@ -1,0 +1,72 @@
+# Module 4 — Storage Fundamentals
+- slug: block-device
+  term: Block Device
+  mental_model: A slab of numbered blocks the kernel can read and write — it has no idea what a file is.
+  technical: "A device addressed in fixed-size blocks (/dev/nvme0n1). Disks, partitions, USB sticks and network volumes all present this interface; filesystems are built on top of it."
+  why_it_matters: The bottom layer of every storage question — everything above it is structure someone wrote into those blocks.
+  related: [partition, filesystem-format]
+  module: storage
+
+- slug: partition
+  term: Partition
+  mental_model: A declared range of blocks on a disk — "these are mine".
+  technical: An entry in the disk's partition table marking a block range, itself presented as a block device (/dev/nvme0n1p1).
+  why_it_matters: Why one physical disk can carry an ext4 root and a tiny vfat EFI partition at the same time.
+  related: [block-device, filesystem-format]
+  module: storage
+
+- slug: filesystem-format
+  term: Filesystem (format)
+  mental_model: The structure that turns numbered blocks into named files with owners and dates.
+  technical: "A data structure written into a block device — ext4, xfs, vfat, btrfs. A format, not a place. Formatting destroys whatever structure was there before."
+  why_it_matters: "\"Which filesystem is this on?\" is the first question in most storage incidents."
+  related: [partition, mount-point, inode, filesystem]
+  module: storage
+
+- slug: mount-point
+  term: Mount Point
+  mental_model: The directory where a filesystem is grafted into the one visible tree.
+  technical: "A path at which a filesystem is attached. A given path belongs to the LONGEST matching mount. Mounting hides whatever was already in the directory without deleting it."
+  why_it_matters: Why / and /boot/efi look like one tree and are not, and why files sometimes seem to vanish.
+  related: [filesystem-format]
+  module: storage
+
+- slug: disk-usage
+  term: Disk Usage (df vs du)
+  mental_model: "df is the filesystem's own accounting; du is a walk of the directory tree. df tells you THAT, du tells you WHERE."
+  technical: "df queries filesystem metadata (fast, authoritative). du sums files it can reach by name (slow, blind to unlinked-but-open files). A disagreement is normally a deleted file still held open by a process."
+  why_it_matters: The gap between them is the most confusing storage bug there is.
+  related: [filesystem-format, inode]
+  module: storage
+
+- slug: inode
+  term: Inode
+  mental_model: The index card for a file — everything about it except its name and contents.
+  technical: "A record holding a file's metadata and pointers to its blocks. A filesystem has a fixed number, set at format time; a name is a directory entry pointing at one."
+  why_it_matters: "You can hit \"No space left on device\" with gigabytes free — millions of tiny files exhausted the inodes. Check with df -i."
+  related: [filesystem-format, disk-usage]
+  module: storage
+
+- slug: raid
+  term: RAID
+  mental_model: Several disks pretending to be one, so a disk can die without the machine stopping.
+  technical: "Redundant Array of Independent Disks. Mirroring or parity provides AVAILABILITY through disk failure. Every write, including every deletion, is applied to the redundancy immediately and correctly."
+  why_it_matters: It is not a backup, and mistaking it for one is the most expensive storage error there is.
+  related: [backup]
+  module: storage
+
+- slug: backup
+  term: Backup
+  mental_model: An independent copy, somewhere that cannot be destroyed by whatever destroys the original.
+  technical: "A point-in-time copy stored on separate media, ideally off-site, with retention deep enough to reach past a corruption you did not notice immediately."
+  why_it_matters: A copy on the same disk shares a fate with the thing it protects. 3-2-1 exists for a reason.
+  related: [raid, restore-test]
+  module: storage
+
+- slug: restore-test
+  term: Restore Test
+  mental_model: Actually putting the backup back and checking it is what you expected.
+  technical: "Restoring a dump into a scratch database, verifying row counts and the newest record's timestamp, then discarding it. The only evidence that distinguishes a backup from a file."
+  why_it_matters: "Every backup failure mode is silent: empty dumps, truncated dumps, the wrong database, an unusable key. Only a restore surfaces them."
+  related: [backup]
+  module: storage

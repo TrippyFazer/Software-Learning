@@ -1,0 +1,75 @@
+id: storage/durability-and-what-a-backup-is
+questions:
+  - id: stor-dur-q1
+    type: multiple_choice
+    concepts: [raid, backup]
+    prompt: A RAID mirror protects you against which of these?
+    options:
+      - Accidentally deleting a directory
+      - A disk failing while the machine keeps serving
+      - A bad database migration
+      - The building burning down
+    answer_index: 1
+    explanation: >
+      RAID is an availability mechanism. It writes every change — including
+      every deletion — to both disks immediately and correctly. It buys you
+      uptime through hardware failure, and nothing else.
+
+  - id: stor-dur-q2
+    type: multiple_choice
+    concepts: [backup]
+    prompt: >
+      Nightly database dumps are written to `~/backups` on the same
+      filesystem as the databases. What does that protect against?
+    options:
+      - Nothing at all
+      - Operator error and bad migrations, but not loss of the machine
+      - Everything, as long as the job runs nightly
+      - Only hardware failure
+    answer_index: 1
+    explanation: >
+      It is real protection against a dropped table or a bad migration, and
+      none at all against losing the instance. Until a copy leaves the machine,
+      it is half a backup — which is exactly the state this server is in.
+
+  - id: stor-dur-q3
+    type: multiple_choice
+    concepts: [restore-test]
+    prompt: What is the only evidence that a backup actually works?
+    options:
+      - The backup job exited with status 0
+      - A file of a plausible size exists with last night's date
+      - A restore you performed, with the contents checked
+      - Monitoring shows the job ran
+    answer_index: 2
+    explanation: >
+      Every other signal has failed for somebody, silently: empty dumps,
+      truncated dumps, dumps of the wrong database, dumps nobody could decrypt.
+      Restore into a scratch database, check row counts and the newest
+      timestamp, then discard it.
+
+  - id: stor-dur-q4
+    type: multiple_choice
+    concepts: [backup]
+    prompt: >
+      This server's backup script spent nine consecutive nights discarding
+      good dumps because of a validation bug. Why did nobody notice?
+    options:
+      - The script crashed loudly but nobody was logged in
+      - It reported the failure into a log file nobody was reading, and nothing else changed
+      - The database was down at the same time
+      - The backups were actually fine
+    answer_index: 1
+    explanation: >
+      The machine was healthy, the application was fine, and the failure went
+      into a log. Backup failures are silent by nature — the system that has
+      stopped protecting you looks identical to the one that is.
+
+  - id: stor-dur-q5
+    type: text
+    concepts: [backup]
+    prompt: "Three copies, two kinds of media, one off-site. What is this rule called? (Digits, e.g. 9-9-9)"
+    accept: ["3-2-1", "321", "3 2 1", "3-2-1 rule", "the 3-2-1 rule"]
+    explanation: >
+      The 3-2-1 rule. It is a rule of thumb rather than a law, but every part
+      of it exists because someone lost data to the failure it prevents.

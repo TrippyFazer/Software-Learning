@@ -1,0 +1,56 @@
+# Module 5 — Server Hardware
+- slug: vcpu
+  term: vCPU
+  mental_model: What the cloud sells you as "a CPU" — usually one thread, not one whole core.
+  technical: "On most cloud instances one vCPU is one hardware thread. A '2 vCPU' t3.medium is one physical core with SMT: lscpu reports Core(s) per socket 1, Thread(s) per core 2."
+  why_it_matters: Explains why 2 vCPU does not mean two independent cores, and why the API runs 2 workers rather than 8.
+  related: [core-vs-thread]
+  module: hardware
+
+- slug: core-vs-thread
+  term: Core vs Thread
+  mental_model: A core is a worker. A thread is a second queue feeding the same worker while it waits.
+  technical: "A physical core is an execution unit. SMT/hyper-threading exposes two logical processors sharing one core's machinery — real gains when one stream stalls, but not twice the work."
+  why_it_matters: The difference between the number on the invoice and the parallel work the machine can really do.
+  related: [vcpu]
+  module: hardware
+
+- slug: ram
+  term: RAM
+  mental_model: The desk you work on — fast, volatile, and much smaller than the filing cabinet.
+  technical: Volatile working memory holding running processes and the kernel's caches. Contents are lost on power loss, which is why durability always ends up on disk.
+  why_it_matters: Too little CPU makes a machine slow; too little RAM makes it kill things.
+  related: [page-cache, oom-killer]
+  module: hardware
+
+- slug: page-cache
+  term: Page Cache (buff/cache)
+  mental_model: RAM the kernel borrowed to remember recently-read disk blocks — handed back the instant a program needs it.
+  technical: "Reclaimable memory holding filesystem pages. It appears under buff/cache in `free`, which is why `free` looks alarmingly small and `available` does not."
+  why_it_matters: "Reading the wrong column in `free` is the most common false alarm on Linux. Unused RAM is wasted RAM."
+  related: [ram]
+  module: hardware
+
+- slug: oom-killer
+  term: OOM Killer
+  mental_model: The kernel's last resort — pick a process and kill it, so the machine survives.
+  technical: "When memory cannot be reclaimed, the kernel scores processes and SIGKILLs the worst offender. Exit code 137 (128+9) is the fingerprint; journalctl -k names the victim."
+  why_it_matters: "Produces a container that 'restarted for no reason' with nothing in the application log — because SIGKILL cannot be caught."
+  related: [ram, swap, memory-limit]
+  module: hardware
+
+- slug: swap
+  term: Swap
+  mental_model: Disk pretending to be memory — slow, but better than being killed.
+  technical: Disk space the kernel uses to hold pages evicted from RAM. Converts a hard out-of-memory failure into a slow one; on cloud storage it is orders of magnitude slower than RAM.
+  why_it_matters: Buys survival, not capacity. A machine actively swapping its working set is effectively down.
+  related: [oom-killer, ram]
+  module: hardware
+
+- slug: memory-limit
+  term: Memory Limit
+  mental_model: A leash on one container, so it cannot drag the whole machine down with it.
+  technical: "A cgroup cap (mem_limit / deploy.resources). Exceeding it kills that container only. It bounds a failure; it does not create memory."
+  why_it_matters: "Why the API, worker and databases have limits and the shared Caddy deliberately does not — its blast radius is every site at once."
+  related: [oom-killer]
+  module: hardware

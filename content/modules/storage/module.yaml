@@ -3,6 +3,11 @@ number: 4
 stage: 2
 title: Storage Fundamentals
 description: >
-  Disks, partitions, filesystems, mounts, and RAID concepts — how bytes survive.
-lessons: []
-implemented: false
+  Disks, partitions, filesystems, mounts — and the drill every server
+  operator eventually runs at 2am: the disk is full, find what is eating
+  it, get the space back. Taught on this server's own 77 GB.
+lessons:
+  - disks-partitions-filesystems
+  - space-and-what-eats-it
+  - durability-and-what-a-backup-is
+implemented: true

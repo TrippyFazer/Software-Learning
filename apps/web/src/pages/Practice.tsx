@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
 import Markdown from "../components/Markdown";
 import Terminal from "../components/Terminal";
+import TerminalUnavailable from "../components/TerminalUnavailable";
 import type { Curriculum, ExerciseInfo, TermState } from "../types";
 
 /** /practice                → exercise picker (incl. sandbox)
@@ -71,7 +72,7 @@ function ExercisePage({ slug }: { slug: string }) {
     queryFn: () => api.get(`/api/content/exercises/${slug}`),
   });
 
-  const { data: state } = useQuery<TermState>({
+  const { data: state, isError: termFailed } = useQuery<TermState>({
     queryKey: ["termstate", slug],
     queryFn: () => api.post(`/api/simterm/exercises/${slug}/start`),
     staleTime: Infinity,
@@ -105,6 +106,8 @@ function ExercisePage({ slug }: { slug: string }) {
     setHints((prev) => [...prev, h.hint]);
   }
 
+  // Offline, the simulator cannot be started. Say that, rather than spinning.
+  if (termFailed) return <TerminalUnavailable title={info?.title} />;
   if (!info || !state) return <p className="muted">loading…</p>;
 
   const isSandbox = info.goal_checklist.length === 0;

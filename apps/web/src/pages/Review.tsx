@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../api";
+import { postQueued } from "../offline";
 import type { Flashcard } from "../types";
 
 /** Flashcard review. Simple honest self-grading against Leitner boxes —
  * the full spaced-repetition scheduler is a future version (ROADMAP). */
 export default function Review() {
   const qc = useQueryClient();
-  const { data: due } = useQuery<Flashcard[]>({
+  const { data: due, isError } = useQuery<Flashcard[]>({
     queryKey: ["dueCards"],
     queryFn: () => api.get("/api/learning/flashcards/due"),
     staleTime: Infinity,
@@ -16,9 +17,16 @@ export default function Review() {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
+  // Flashcards are the one thing that works completely offline: the card
+  // carries its own answer, and the grading is your own honesty. Only the
+  // scheduling update needs the server, so it is queued.
   const review = useMutation({
     mutationFn: ({ slug, correct }: { slug: string; correct: boolean }) =>
-      api.post("/api/learning/flashcards/review", { card_slug: slug, correct }),
+      postQueued(
+        "/api/learning/flashcards/review",
+        { card_slug: slug, correct },
+        `Flashcard ${correct ? "known" : "missed"}: ${slug}`,
+      ),
     onSuccess: () => {
       setFlipped(false);
       setIndex((i) => i + 1);
@@ -26,6 +34,20 @@ export default function Review() {
     },
   });
 
+  // Offline with nothing cached: say so. Spinning on "loading…" forever is
+  // the single most common way an "offline-capable" app breaks its promise.
+  if (isError) {
+    return (
+      <>
+        <h1>Review</h1>
+        <p className="muted">
+          Your due cards were never downloaded to this device. Open{" "}
+          <b>Offline &amp; install</b> while online and press{" "}
+          <b>Download everything</b>.
+        </p>
+      </>
+    );
+  }
   if (!due) return <p className="muted">loading…</p>;
 
   const card = due[index];

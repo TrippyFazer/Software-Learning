@@ -4,7 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0d1117" />
+    <meta name="description" content="Learn Linux, networking, Docker and infrastructure from the ground up." />
     <title>Infrastructure Learning Lab</title>
+
+    <!-- Installability. The manifest is what turns a page into something the
+         operating system will give an icon and its own window. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <!-- iOS ignores the manifest's icons entirely and uses this one. Without
+         it, "Add to Home Screen" produces a blurry screenshot as the icon. -->
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Learning Lab" />
   </head>
   <body>
     <div id="root"></div>

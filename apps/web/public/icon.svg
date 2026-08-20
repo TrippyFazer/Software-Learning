@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Learning Lab">
+  <rect width="120" height="120" rx="24" fill="#0d1117"/>
+  <path d="M24 38 L46 60 L24 82" fill="none" stroke="#3fb950" stroke-width="11"
+        stroke-linecap="square" stroke-linejoin="miter"/>
+  <rect x="60" y="76" width="38" height="10" fill="#c9d1d9"/>
+</svg>

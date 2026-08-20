@@ -1,11 +1,17 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { api } from "../api";
+import { postQueued } from "../offline";
 import type { AnswerResult, QuizQuestion } from "../types";
 
 /** One quiz question. The answer key lives server-side only: we submit and
  * the backend tells us the outcome + explanation. Answers are not revealed
- * until the learner commits (master plan §8). */
+ * until the learner commits (master plan §8).
+ *
+ * OFFLINE: the answer is kept on the device and sent later, but it is NOT
+ * graded locally. Grading here would require shipping the answer key to the
+ * browser — the exact thing Module 0 teaches you not to do, and which the API
+ * deliberately prevents by stripping `answer_index` from every quiz payload.
+ * So offline you can still sit the quiz; you find out how you did on landing. */
 export function QuestionBlock({
   question,
   onAnswered,
@@ -16,17 +22,26 @@ export function QuestionBlock({
   const [selected, setSelected] = useState<number | null>(null);
   const [text, setText] = useState("");
   const [result, setResult] = useState<AnswerResult | null>(null);
+  const [queued, setQueued] = useState(false);
 
   const submit = useMutation({
     mutationFn: (answer: string | number) =>
-      api.post<AnswerResult>("/api/learning/answers", { question_id: question.id, answer }),
+      postQueued<AnswerResult>(
+        "/api/learning/answers",
+        { question_id: question.id, answer },
+        `Quiz answer: ${question.id}`,
+      ),
     onSuccess: (res) => {
-      setResult(res);
-      onAnswered?.(res.correct);
+      if (res.status === "queued") {
+        setQueued(true);
+        return;
+      }
+      setResult(res.data);
+      onAnswered?.(res.data.correct);
     },
   });
 
-  const answered = result !== null;
+  const answered = result !== null || queued;
 
   return (
     <div className="card">
@@ -81,10 +96,18 @@ export function QuestionBlock({
         </button>
       )}
 
-      {answered && result && (
+      {result && (
         <div className="explanation">
           <strong>{result.correct ? "Correct." : "Not quite."}</strong>{" "}
           {result.explanation}
+        </div>
+      )}
+
+      {queued && (
+        <div className="explanation">
+          <strong>Answer recorded.</strong> You are offline, so it will be
+          marked when you reconnect — the answer key stays on the server on
+          purpose.
         </div>
       )}
     </div>

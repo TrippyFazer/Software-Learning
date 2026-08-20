@@ -22,6 +22,11 @@ LEARN → VISUALIZE → PRACTICE → MAKE A MISTAKE → UNDERSTAND WHY
   the host (see [docs/SECURITY.md](docs/SECURITY.md)).
 - Mastery is tracked per **concept**, with transparent, explainable scoring —
   not "lesson completed = learned".
+- **Works on a plane.** Lessons, vocabulary and flashcards are downloadable to
+  the device and the app installs like a native one; anything you complete
+  offline is queued and synced on reconnect. Terminal exercises need the
+  server, and the app says so rather than pretending. See
+  [ADR-0007](docs/ADR/0007-offline-first-pwa.md).
 - Failure-driven exercises: some start broken on purpose.
 - The deployment itself is part of the curriculum ("About This Server").
 

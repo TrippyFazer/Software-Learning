@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
+import { postQueued } from "../offline";
 import Markdown from "../components/Markdown";
 import { QuestionBlock } from "../components/QuizBlock";
 import type { Lesson, LessonProgressMap, Quiz } from "../types";
@@ -28,14 +29,27 @@ export default function LessonPage() {
     enabled: !!data?.quiz && quizOpen,
   });
 
-  // Mark the lesson started on first view.
+  // Mark the lesson started on first view. Queued when offline, because
+  // "started" is exactly the kind of small signal that would otherwise be
+  // silently lost for a whole flight's worth of reading.
   useEffect(() => {
-    if (data) void api.post(`/api/learning/lessons/${slug}/start`);
+    if (data) {
+      void postQueued(`/api/learning/lessons/${slug}/start`, undefined, `Started ${slug}`).catch(
+        () => undefined,
+      );
+    }
   }, [data, slug]);
 
+  const [queuedComplete, setQueuedComplete] = useState(false);
+
   const complete = useMutation({
-    mutationFn: () => api.post(`/api/learning/lessons/${slug}/complete`),
-    onSuccess: () => {
+    mutationFn: () =>
+      postQueued(`/api/learning/lessons/${slug}/complete`, undefined, `Completed ${slug}`),
+    onSuccess: (res) => {
+      if (res.status === "queued") {
+        setQueuedComplete(true);
+        return;
+      }
       void qc.invalidateQueries({ queryKey: ["lessonProgress"] });
       void qc.invalidateQueries({ queryKey: ["progress"] });
     },
@@ -44,7 +58,7 @@ export default function LessonPage() {
   if (error) return <p className="error-text">Lesson not found.</p>;
   if (!data) return <p className="muted">loading…</p>;
 
-  const done = progress?.[slug]?.completed;
+  const done = progress?.[slug]?.completed || queuedComplete;
 
   return (
     <>
@@ -92,9 +106,11 @@ export default function LessonPage() {
 
       <div className="card mt spread">
         <span className="muted small">
-          {done
-            ? "Lesson completed — its concepts are marked as introduced."
-            : "Finished reading and practicing? Mark it complete to record the concepts as introduced."}
+          {queuedComplete
+            ? "Marked complete on this device — it reaches the server when you reconnect."
+            : done
+              ? "Lesson completed — its concepts are marked as introduced."
+              : "Finished reading and practicing? Mark it complete to record the concepts as introduced."}
         </span>
         <button
           className={`btn ${done ? "green" : ""}`}

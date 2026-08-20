@@ -4,6 +4,7 @@ import { api } from "../api";
 import Markdown from "../components/Markdown";
 import { QuestionBlock } from "../components/QuizBlock";
 import Terminal from "../components/Terminal";
+import TerminalUnavailable from "../components/TerminalUnavailable";
 import type { ChallengeInfo, ChallengeStatus, TermState } from "../types";
 
 export default function Challenge() {
@@ -16,7 +17,7 @@ export default function Challenge() {
     queryFn: () => api.get(`/api/content/challenges/${slug}`),
   });
 
-  const { data: state } = useQuery<TermState>({
+  const { data: state, isError: termFailed } = useQuery<TermState>({
     queryKey: ["challstate", slug],
     queryFn: () => api.post(`/api/simterm/challenges/${slug}/start`),
     staleTime: Infinity,
@@ -58,6 +59,7 @@ export default function Challenge() {
     },
   });
 
+  if (termFailed) return <TerminalUnavailable title={info?.title} />;
   if (!info || !state) return <p className="muted">loading…</p>;
 
   return (

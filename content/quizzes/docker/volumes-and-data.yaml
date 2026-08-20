@@ -1,0 +1,85 @@
+id: docker/volumes-and-data
+questions:
+  - id: dock-vol-q1
+    type: multiple_choice
+    concepts: [volume]
+    prompt: You run `docker compose down` on a stack with a named volume. What is gone?
+    options:
+      - The containers, the network, and the volume's data
+      - The containers and the network; the volume and its data remain
+      - Only the containers; network and volume remain
+      - Nothing is removed, everything is just stopped
+    answer_index: 1
+    explanation: >
+      `down` removes containers and the project network but never named
+      volumes. Adding `-v` is what deletes them — the two-character difference
+      between a routine restart and data loss.
+
+  - id: dock-vol-q2
+    type: multiple_choice
+    concepts: [volume, container]
+    prompt: >
+      A Redis cache service has no `volumes:` entry. The stack is brought down
+      and up again. What happened to the data Redis had written?
+    options:
+      - It was preserved automatically — Docker snapshots container data
+      - It is gone; it lived in the container's writable layer
+      - It moved to the default volume
+      - Redis refuses to start without a volume
+    answer_index: 1
+    explanation: >
+      No volume means the data was in the writable layer, which is deleted
+      with the container. For a cache that may be entirely fine — the mistake
+      is not knowing which of your services are in that position.
+
+  - id: dock-vol-q3
+    type: multiple_choice
+    concepts: [volume, bind-mount]
+    prompt: >
+      Which is the right choice for mounting this Lab's `content/` curriculum
+      directory into the API container?
+    options:
+      - A named volume, so the content is managed by Docker
+      - A read-only bind mount of the host directory
+      - No mount — copy the content in with docker cp after each start
+      - A named volume, then copy the files in manually
+    answer_index: 1
+    explanation: >
+      The curriculum comes from git on the host and the application must never
+      write to it. That is exactly a read-only bind mount
+      (`./content:/app/content:ro`). Named volumes are for data the
+      application generates.
+
+  - id: dock-vol-q4
+    type: multiple_choice
+    concepts: [volume]
+    prompt: >
+      A volume is mounted at `/var/lib/postgres/data`, but Postgres writes to
+      `/var/lib/postgresql/data`. What do you observe?
+    options:
+      - The container refuses to start with a mount error
+      - Postgres logs a warning about the unused volume
+      - Everything looks healthy, and the data is silently lost on container removal
+      - Docker corrects the path automatically
+    answer_index: 2
+    explanation: >
+      There is no error. The volume is mounted at a directory nothing uses,
+      and the real data goes into the writable layer. It looks perfect until
+      the day the container is replaced — which is why restarting is the only
+      real test of durability.
+
+  - id: dock-vol-q5
+    type: multiple_choice
+    concepts: [volume]
+    prompt: >
+      Why is losing Caddy's `caddy_data` volume worse than it sounds?
+    options:
+      - It only holds logs, so nothing is lost
+      - It holds TLS certificates and the ACME account key; re-issuing can hit Let's Encrypt rate limits
+      - Caddy will not start at all without it
+      - It holds the site configuration, which would need rewriting
+    answer_index: 1
+    explanation: >
+      Configuration is in git; certificates are not. Losing the volume forces
+      re-issuance, and Let's Encrypt's rate limits can leave the domain
+      without a certificate for days. That volume is state, not cache.

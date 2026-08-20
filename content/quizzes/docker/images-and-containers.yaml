@@ -1,0 +1,79 @@
+id: docker/images-and-containers
+questions:
+  - id: dock-img-q1
+    type: multiple_choice
+    concepts: [image, container]
+    prompt: >
+      You run three containers from the same postgres:16 image, then
+      `docker exec` into one and delete a file. What happened to the image?
+    options:
+      - The image changed, so the other two containers see the deletion too
+      - Nothing — the deletion is in that one container's writable layer
+      - The image is rebuilt automatically on the next run
+      - Docker refuses the deletion because images are read-only
+    answer_index: 1
+    explanation: >
+      Images are read-only. Each container gets its own thin writable layer,
+      and every change lands there. The other containers are unaffected, and
+      the change disappears when that container is removed.
+
+  - id: dock-img-q2
+    type: multiple_choice
+    concepts: [container]
+    prompt: What is the most accurate description of a running container?
+    options:
+      - A lightweight virtual machine with its own small kernel
+      - An emulator running the image's operating system
+      - An ordinary process on the host kernel, isolated with namespaces and cgroups
+      - A chroot jail with no network access
+    answer_index: 2
+    explanation: >
+      There is no guest kernel. A container is a normal host process given its
+      own filesystem view, network namespace and process tree. That is why it
+      starts in milliseconds and why a 3.7 GB machine can run seven of them.
+
+  - id: dock-img-q3
+    type: multiple_choice
+    concepts: [layer]
+    prompt: >
+      A Dockerfile copies all source, then installs dependencies. What is the
+      practical consequence?
+    options:
+      - Nothing — layer order does not affect behaviour
+      - Every source change invalidates the cache and re-installs every dependency
+      - The image will be smaller but slower to run
+      - Dependencies will be missing at runtime
+    answer_index: 1
+    explanation: >
+      Changing a layer invalidates every layer after it. Source changes
+      constantly, dependencies rarely — so dependencies must be installed
+      first. The image still works; builds just become slow enough that you
+      stop rebuilding, which is its own kind of broken.
+
+  - id: dock-img-q4
+    type: multiple_choice
+    concepts: [image, registry]
+    prompt: >
+      Why does Task OS pin `postgres:17-alpine` instead of `postgres:latest`?
+    options:
+      - "`latest` images are larger"
+      - "`latest` is not available for postgres"
+      - A tag is a moving pointer, so `latest` can hand you a new major version on a rebuild
+      - Pinning makes the container start faster
+    answer_index: 2
+    explanation: >
+      Tags move. `17-alpine` keeps receiving patches within the 17 line, but
+      never becomes 18. `latest` means "most recently pushed" — one day that
+      is a major version your existing data directory will not start under.
+
+  - id: dock-img-q5
+    type: text
+    concepts: [container]
+    prompt: >
+      One word: what is the name for the thin, per-container filesystem layer
+      that is discarded when the container is removed?
+    accept: [writable, "writable layer", "the writable layer", "container layer", scratch]
+    explanation: >
+      The writable layer. It sits on top of the image's read-only layers and
+      is deleted with the container — the reason anything durable must live on
+      a volume.

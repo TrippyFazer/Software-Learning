@@ -1,7 +1,12 @@
 # Curriculum
 
-The complete learning sequence. Only **Modules 0–3** (plus the Stage 1 boss
-challenge) ship with content in v0.1; everything else is planned structure.
+The complete learning sequence. **Modules 0–3** (plus the Stage 1 boss
+challenge) and **Module 8 — Docker** ship with content; everything else is
+planned structure.
+
+Module 8 was written out of sequence, deliberately: the learner runs Docker
+daily on the server this Lab is deployed to, and the module is taught from
+that server's own compose files. Relevance beats numbering.
 
 Every module teaches toward two real systems the learner is building:
 **Brain Core** (personal/organizational intelligence platform) and a
@@ -49,7 +54,7 @@ working. Given filesystem state, processes, disk usage, service state, and
 logs, diagnose the problem. Requires combining Stage 1 concepts; the answer
 is never named in the prompt.
 
-### Stage 2 — Infrastructure
+### Stage 2 — Infrastructure (Module 8 ✅)
 
 | # | Module | Focus |
 |---|--------|-------|
@@ -57,7 +62,7 @@ is never named in the prompt.
 | 5 | Server Hardware | CPU, RAM, storage tiers, NICs, what specs actually mean |
 | 6 | Plex Fundamentals | media libraries, clients, streaming vs transcoding |
 | 7 | Virtualization and Proxmox | VMs, hypervisors, containers vs VMs |
-| 8 | Docker | images, containers, volumes, networks, Compose — taught partly using *this app's own* Compose file |
+| 8 | Docker ✅ | images, containers, volumes, networks, Compose — taught from *this app's own* Compose file and Task OS's. 4 lessons, 20 quiz questions, 3 terminal exercises |
 
 *(Note: the master plan lists Storage in Stage 1 and hardware onward in
 Stage 2; storage content is scheduled with Stage 2 delivery but numbered

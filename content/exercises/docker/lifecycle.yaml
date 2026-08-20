@@ -1,0 +1,37 @@
+id: docker/lifecycle
+title: "Mission: The Container Lifecycle"
+mission: |
+  A machine with Docker installed and nothing running on it. Prove to
+  yourself that images and containers are different things.
+
+  1. Pull the `nginx:alpine` image, then list the images on this machine.
+  2. Run **two** containers from that one image, in the background, named
+     `web-a` and `web-b`:
+     `docker run -d --name web-a nginx:alpine`
+  3. `docker ps` — both should be running.
+  4. Stop `web-b`, then run `docker ps` and `docker ps -a`. Notice that a
+     stopped container still exists; it has not evaporated.
+  5. Remove `web-b` entirely (`docker rm web-b`).
+  6. Run `docker images` again.
+
+  **The thing to notice:** the image list did not change at any point.
+  You created and destroyed containers; the template was untouched.
+
+  Finish with `web-a` still running and `web-b` gone.
+concepts:
+  - image
+  - container
+cwd: /home/learner
+initial_files:
+  /home/learner: null
+goal:
+  - type: container_running
+    name: web-a
+    description: "A container named web-a is running"
+  - type: container_absent
+    name: web-b
+    description: "The container web-b has been removed (not merely stopped)"
+hints:
+  - "Start with `docker pull nginx:alpine`, then `docker images` to see it arrive."
+  - "`docker run -d --name web-a nginx:alpine` — the -d means detached (background), and --name gives it a stable name instead of a generated one."
+  - "`docker rm` refuses to remove a RUNNING container. Stop it first: `docker stop web-b` then `docker rm web-b`. (`docker rm -f` does both, which is convenient and worth being careful with.)"

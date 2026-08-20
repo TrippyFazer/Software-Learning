@@ -1,0 +1,68 @@
+id: docker/volume-disaster
+title: "Mission: Lose the Data on Purpose"
+mission: |
+  In `~/shop` there is a stack with two services: a **database** with a
+  named volume, and a **cache** with none. The database already holds
+  `orders.tbl` — 1,200 orders.
+
+  Work through this deliberately and watch what each step does.
+
+  1. `cd shop`, read the file: `cat docker-compose.yml`.
+     Before running anything, decide which service's data survives.
+  2. `docker compose up -d`
+  3. Look inside both:
+     `docker exec shop-db-1 ls /var/lib/postgresql/data`
+     `docker exec shop-cache-1 ls /data`
+  4. `docker compose down`, then `docker compose up -d`, then look inside
+     both again. **One of them lost its data. Be sure you know which,
+     and why, before continuing.**
+  5. Now the destructive one: `docker compose down -v`
+  6. `docker compose up -d` and look inside the database again.
+     Check `docker logs shop-db-1`.
+
+  The orders are gone. `docker volume ls` will show a volume — a *new,
+  empty* one. That is what `-v` does, and it is two characters away from
+  a command you will run every week.
+
+  Finish with the stack up.
+concepts:
+  - volume
+  - container
+  - compose
+cwd: /home/learner
+initial_files:
+  /home/learner/shop: null
+  /home/learner/shop/docker-compose.yml:
+    content: |
+      name: shop
+
+      services:
+        db:
+          image: postgres:16
+          # A named volume: its lifetime is independent of this container.
+          volumes:
+            - pgdata:/var/lib/postgresql/data
+          x-sim-initial-data:
+            /var/lib/postgresql/data/orders.tbl: "1200 rows"
+
+        cache:
+          image: redis:7
+          # No volumes: line. Everything this writes is in the container's
+          # own writable layer.
+          x-sim-initial-data:
+            /data/session.cache: "warm"
+
+      volumes:
+        pgdata:
+    mode: "644"
+goal:
+  - type: container_running
+    name: shop-db-1
+    description: "The stack is running again after the disaster"
+  - type: volume_exists
+    name: shop_pgdata
+    description: "A shop_pgdata volume exists — note that it is a NEW, empty one"
+hints:
+  - "`cd shop` first — `docker compose` looks for docker-compose.yml in the CURRENT directory, and says 'no configuration file provided' if you are elsewhere."
+  - "After the first plain `down` and `up -d`, the DATABASE keeps orders.tbl and the CACHE is empty. The database has a named volume; the cache does not."
+  - "`docker compose down -v` deletes the named volumes. Then `up -d` creates a fresh empty one — `docker logs shop-db-1` will tell you it is initializing a new empty cluster."

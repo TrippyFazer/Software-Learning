@@ -19,6 +19,7 @@ for execution only.
 
 import shlex
 
+from app.modules.simterm import docker_sim
 from app.modules.simterm.vfs import USERNAME, VfsError, VirtualFileSystem
 
 MAX_LINE_LENGTH = 500
@@ -305,6 +306,17 @@ def _execute_file(vfs: VirtualFileSystem, path: str) -> CommandResult:
     return CommandResult(lines)
 
 
+def _docker(vfs: VirtualFileSystem, args: list[str]) -> CommandResult:
+    """`docker ...` — handed to the simulated engine in docker_sim.
+
+    It is a dictionary, not a daemon. There is no Docker socket anywhere in
+    this application (docs/SECURITY.md rule 2), and mounting one so the Lab
+    could drive "real" containers would hand a web app root on the host.
+    """
+    lines, ok = docker_sim.run(vfs, args)
+    return CommandResult(lines, ok)
+
+
 _HANDLERS = {
     "pwd": _pwd,
     "whoami": _whoami,
@@ -320,4 +332,5 @@ _HANDLERS = {
     "chmod": _chmod,
     "help": _help,
     "clear": _clear,
+    "docker": _docker,
 }

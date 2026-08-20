@@ -1,0 +1,70 @@
+id: docker/fix-the-stack
+title: "Mission: Fix the Stack"
+mission: |
+  `~/api-stack/docker-compose.yml` deploys an API and its database to a
+  server with a **public IP**. It has three defects, one from each lesson
+  in this module. Read it first — all three are visible without running
+  anything.
+
+  1. `cd api-stack` and `cat docker-compose.yml`.
+  2. Bring it up: `docker compose up -d`
+  3. `docker ps` — look hard at the PORTS column. One line there should
+     alarm you.
+  4. `docker volume ls` — is anything protecting the database's data?
+
+  **The three defects**
+
+  - The database publishes its port. On a public IP that means the
+    internet, and Docker's firewall rules bypass ufw.
+  - The database has no named volume, so its data lives in the
+    container's writable layer.
+  - There is no `name:`, so the project is named after the directory —
+    move the folder and `down` stops finding this stack.
+
+  **Your repair.** Write a corrected compose file. The simulator has no
+  text editor, so build it with `echo` and append (`>>`), or write it in
+  one go with a quoted multi-line string. Then:
+
+  ```
+  docker compose down
+  docker compose up -d
+  ```
+
+  You are done when a project named `apistack` is running, its database
+  publishes nothing, and a named volume `apistack_dbdata` exists.
+concepts:
+  - port-publishing
+  - volume
+  - compose
+cwd: /home/learner
+initial_files:
+  /home/learner/api-stack: null
+  /home/learner/api-stack/docker-compose.yml:
+    content: |
+      services:
+        api:
+          image: myorg/api:1.4
+          ports:
+            - "8080:8000"
+
+        db:
+          image: postgres:16
+          ports:
+            - "5432:5432"
+    mode: "644"
+goal:
+  - type: file_contains
+    path: /home/learner/api-stack/docker-compose.yml
+    text: "name: apistack"
+    description: "The compose file sets an explicit project name: apistack"
+  - type: volume_exists
+    name: apistack_dbdata
+    description: "A named volume apistack_dbdata exists for the database"
+  - type: container_running
+    name: apistack-db-1
+    description: "The database is running under the apistack project"
+hints:
+  - "Read the file first. The `ports:` line under `db` is the dangerous one — a database on a public IP. The API's published port is fine; something has to be reachable."
+  - "You need three changes: add `name: apistack` at the top, delete the db's ports: block, and add a `volumes:` mount for the db plus a top-level `volumes:` declaration."
+  - "Without an editor, rewrite the whole file: `echo 'name: apistack' > docker-compose.yml` then append each line with `>>`. Check it with `cat` before running `docker compose up -d`."
+  - "Remember to `docker compose down` FIRST, while the old project name still matches — otherwise the old containers are orphaned under the old name."

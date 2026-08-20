@@ -45,9 +45,15 @@ def make_file(
 
 
 class VirtualFileSystem:
-    def __init__(self, root: dict | None = None, cwd: str = HOME):
+    def __init__(self, root: dict | None = None, cwd: str = HOME, docker: dict | None = None):
         self.root = root or self._default_root()
         self.cwd = cwd
+        # Simulated Docker engine state (images/containers/volumes/networks),
+        # carried alongside the filesystem because a container's lifetime is
+        # not a file. Deliberately a plain dict with no schema of its own here:
+        # docker_sim owns its shape, and this module stays a filesystem.
+        # It rides in the same JSON column, so no migration was needed.
+        self.docker = docker if docker is not None else {}
 
     # --- construction / serialization ---------------------------------------
 
@@ -83,7 +89,7 @@ class VirtualFileSystem:
         return vfs
 
     def to_dict(self) -> dict:
-        return {"root": self.root, "cwd": self.cwd}
+        return {"root": self.root, "cwd": self.cwd, "docker": self.docker}
 
     @classmethod
     def from_dict(cls, data: dict) -> "VirtualFileSystem":
@@ -94,7 +100,14 @@ class VirtualFileSystem:
         # never be written.
         import copy
 
-        return cls(root=copy.deepcopy(data["root"]), cwd=data["cwd"])
+        # `.get` for docker, not `[...]`: snapshots written before Module 8
+        # existed have no such key, and an exercise in progress must not
+        # explode because the engine gained a feature underneath it.
+        return cls(
+            root=copy.deepcopy(data["root"]),
+            cwd=data["cwd"],
+            docker=copy.deepcopy(data.get("docker") or {}),
+        )
 
     # --- path handling -------------------------------------------------------
 

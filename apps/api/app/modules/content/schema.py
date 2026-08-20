@@ -97,6 +97,12 @@ class Quiz(BaseModel):
 
 # --- Terminal exercises ------------------------------------------------------
 
+DOCKER_GOAL_TYPES = (
+    "container_running", "container_absent",
+    "volume_exists", "volume_absent", "volume_contains",
+)
+
+
 class GoalCheck(BaseModel):
     """One assertion about the learner's virtual filesystem after practice.
 
@@ -107,9 +113,14 @@ class GoalCheck(BaseModel):
     type: Literal[
         "dir_exists", "file_exists", "path_absent",
         "file_contains", "cwd_is", "mode_is",
+        # Module 8: the simulated Docker engine. A container's lifetime is
+        # not a file, so these assert on engine state rather than the VFS.
+        "container_running", "container_absent",
+        "volume_exists", "volume_absent", "volume_contains",
     ]
-    path: str
-    text: str | None = None          # for file_contains
+    path: str = ""                   # filesystem checks
+    name: str | None = None          # docker checks: container / volume name
+    text: str | None = None          # for file_contains / volume_contains
     mode: str | None = None          # for mode_is, e.g. "755"
     description: str                 # learner-facing checklist line
 
@@ -119,6 +130,15 @@ class GoalCheck(BaseModel):
             raise ValueError("file_contains needs text")
         if self.type == "mode_is" and self.mode is None:
             raise ValueError("mode_is needs mode")
+        if self.type in DOCKER_GOAL_TYPES:
+            if not self.name:
+                raise ValueError(f"{self.type} needs a name")
+        elif not self.path:
+            # Filesystem checks without a path were previously impossible
+            # because `path` was required; keep that guarantee now it is not.
+            raise ValueError(f"{self.type} needs a path")
+        if self.type == "volume_contains" and self.text is None:
+            raise ValueError("volume_contains needs text")
         return self
 
 

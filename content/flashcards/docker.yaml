@@ -1,0 +1,54 @@
+# Module 8 flashcards
+- slug: card-image-vs-container
+  front: Image vs container
+  back: "An image is a read-only template; a container is a running instance of it with one thin writable layer on top. One image, many containers. Nothing a container does changes its image."
+  concepts: [image, container]
+  module: docker
+
+- slug: card-container-not-vm
+  front: Why is a container not a virtual machine?
+  back: "A VM boots its own guest kernel on virtual hardware. A container is an ordinary process on the HOST kernel, isolated with namespaces and cgroups. That is why it starts in milliseconds and costs megabytes, not gigabytes."
+  concepts: [container]
+  module: docker
+
+- slug: card-volume-lifetime
+  front: What survives `docker compose down`?
+  back: "Named volumes and their data. Containers, and everything written into a container's own writable layer, do not. `down -v` deletes the volumes too — that flag is the one that loses data."
+  concepts: [volume, container]
+  module: docker
+
+- slug: card-volume-vs-bind
+  front: Volume vs bind mount
+  back: "A volume is storage Docker manages, referenced by name, portable between hosts. A bind mount is a host directory mapped in — its content and permissions are the host's. Use volumes for data, bind mounts for config and source."
+  concepts: [volume, bind-mount]
+  module: docker
+
+- slug: card-ports
+  front: 'What does `ports: "8080:80"` do — and what does omitting it do?'
+  back: "It binds HOST port 8080 and forwards to CONTAINER port 80, making the service reachable from outside the machine. Omitting it leaves the service reachable only by containers on the same Docker network — which is exactly what you want for a database."
+  concepts: [port-publishing]
+  module: docker
+
+- slug: card-service-dns
+  front: How does one container reach another?
+  back: "By SERVICE NAME on the container's own port, over a shared Docker network — `postgres:5432`, `task-os-api:8000`. Docker runs a DNS resolver on user-defined networks. No host port is involved."
+  concepts: [container-network, compose-service]
+  module: docker
+
+- slug: card-layer-cache
+  front: Why do Dockerfiles install dependencies before copying source?
+  back: "Each instruction is a cached layer, and changing one invalidates every layer after it. Source changes constantly; dependencies rarely. Copying source first would re-install everything on every code edit."
+  concepts: [layer, image]
+  module: docker
+
+- slug: card-compose-declarative
+  front: Is `docker compose up` a script?
+  back: "No — it is declarative. The file describes the desired state and Compose converges the machine toward it. Running it twice is safe: containers already matching the spec are left alone."
+  concepts: [compose]
+  module: docker
+
+- slug: card-tag-pinning
+  front: Why pin `postgres:17-alpine` rather than `postgres:latest`?
+  back: "A tag is a moving pointer. `latest` means 'whatever was pushed most recently' — a rebuild months later can hand you a new major version and a database that will not start. Pin the line you intend to run."
+  concepts: [image, registry]
+  module: docker

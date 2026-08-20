@@ -1,0 +1,80 @@
+# Module 8 — Docker
+- slug: image
+  term: Image
+  mental_model: A frozen, read-only template of a filesystem plus a default command — like an install disc.
+  technical: "A stack of read-only layers plus metadata (default command, exposed ports, environment). Identified by repository:tag and by a content digest; the digest, not the tag, is what is immutable."
+  why_it_matters: Nothing you do to a running container changes the image — which is why rebuilding gives you a clean machine every time.
+  related: [container, layer, registry]
+  module: docker
+
+- slug: container
+  term: Container
+  mental_model: A running instance of an image, with a thin scratch layer on top that dies with it.
+  technical: "An isolated process on the host kernel, given its own filesystem view (the image's layers plus one writable layer), its own network namespace, and its own process tree. Not a virtual machine: no guest kernel."
+  why_it_matters: "Explains both the superpower (start/stop/replace freely) and the trap (anything written into that top layer is gone on removal)."
+  related: [image, volume, layer]
+  module: docker
+
+- slug: layer
+  term: Layer
+  mental_model: One step of the build, cached — like a saved game you can restart from.
+  technical: Each Dockerfile instruction produces a filesystem diff. Unchanged layers are reused across builds and shared between images on disk.
+  why_it_matters: Why dependencies are installed before source is copied — a code edit must not invalidate the dependency layer.
+  related: [image]
+  module: docker
+
+- slug: volume
+  term: Volume
+  mental_model: A locker that belongs to the machine, not to the container using it.
+  technical: "Storage managed by Docker, mounted into a container at a path. Its lifetime is independent of any container: `docker compose down` leaves it, `down -v` deletes it."
+  why_it_matters: The single line between "I restarted the database" and "I deleted the database".
+  related: [container, bind-mount]
+  module: docker
+
+- slug: bind-mount
+  term: Bind Mount
+  mental_model: A window from the container onto a real directory on the host.
+  technical: "A host path mounted into the container. Unlike a volume it is not managed by Docker, its content is whatever the host has, and permissions are the host's."
+  why_it_matters: How config and source get in (`./content:/app/content:ro`) — and how a careless mount hands a container part of your real disk.
+  related: [volume]
+  module: docker
+
+- slug: port-publishing
+  term: Publishing a Port
+  mental_model: Drilling one hole from the outside world through to a container.
+  technical: "`ports: \"8080:80\"` binds host port 8080 and forwards to container port 80. Without it, the port is reachable only by containers on the same Docker network."
+  why_it_matters: "A published port is a public door on a public IP. It is the difference between a private database and one the internet can find."
+  related: [container-network, reverse-proxy]
+  module: docker
+
+- slug: container-network
+  term: Container Network
+  mental_model: A private street where containers know each other by name.
+  technical: "A user-defined bridge network with an embedded DNS resolver: containers reach each other by SERVICE NAME on the container's own port, with no host port involved."
+  why_it_matters: Why `reverse_proxy task-os-api:8000` works while port 8000 is published nowhere.
+  related: [port-publishing, compose, compose-service]
+  module: docker
+
+- slug: compose
+  term: Docker Compose
+  mental_model: One file that describes a whole stack, so starting it is one command instead of ten.
+  technical: A declarative spec (services, volumes, networks) applied by `docker compose up`. It converges the machine toward the file; it does not run a script.
+  why_it_matters: The compose file is the truth about what a deployment is — reading one tells you the whole shape of an application.
+  related: [service, container, volume]
+  module: docker
+
+- slug: compose-service
+  term: Service (Compose)
+  mental_model: One named role in the stack — "the database", "the API" — not one specific container.
+  technical: An entry under `services:` describing how to produce containers for that role. Its name becomes the DNS name on the compose network.
+  why_it_matters: You reason about services; Docker produces containers. Confusing the two is why people scale one and wonder why the name changed.
+  related: [compose, container-network, service]
+  module: docker
+
+- slug: registry
+  term: Registry
+  mental_model: The app store images are pulled from.
+  technical: "A server that stores images by repository and tag (Docker Hub, ghcr.io, a private one). `docker pull` fetches, `docker push` publishes."
+  why_it_matters: "`image: postgres:17-alpine` is a download instruction — and pinning the tag is what stops a rebuild silently changing your database version."
+  related: [image]
+  module: docker

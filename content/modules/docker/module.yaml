@@ -3,6 +3,12 @@ number: 8
 stage: 2
 title: Docker
 description: >
-  Images, containers, volumes, and networks — taught partly from this Lab's own compose file.
-lessons: []
-implemented: false
+  Images, containers, volumes, and networks — taught from this Lab's own
+  compose file and from Task OS running on the same server. By the end you
+  can read any docker-compose.yml and say what it will do to a machine.
+lessons:
+  - images-and-containers
+  - volumes-and-data
+  - networks-and-ports
+  - compose-files
+implemented: true

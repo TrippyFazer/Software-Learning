@@ -1,0 +1,82 @@
+id: docker/compose-files
+questions:
+  - id: dock-comp-q1
+    type: multiple_choice
+    concepts: [compose]
+    prompt: You run `docker compose up -d` twice in a row. What happens the second time?
+    options:
+      - Every container is recreated from scratch
+      - Docker errors because the containers already exist
+      - Containers already matching the spec are left running; only differences are applied
+      - A second copy of each container is started
+    answer_index: 2
+    explanation: >
+      Compose is declarative and convergent: it changes only the difference
+      between the file and reality. That is what makes `up -d` safe to run
+      repeatedly, and what makes it the normal deploy command.
+
+  - id: dock-comp-q2
+    type: multiple_choice
+    concepts: [compose]
+    prompt: Why should every compose file set `name:` explicitly?
+    options:
+      - It is required; Compose refuses to start without one
+      - Without it the project name comes from the directory, so container and volume names depend on where the file sits
+      - It makes containers start faster
+      - It is only needed when multiple stacks run on one host
+    answer_index: 1
+    explanation: >
+      Compose falls back to the directory name. Move or rename the folder and
+      `down` no longer finds the stack it created, leaving orphaned containers
+      and volumes with names you have to go discover.
+
+  - id: dock-comp-q3
+    type: multiple_choice
+    concepts: [compose, compose-service]
+    prompt: >
+      What is the practical difference between `depends_on: [postgres]` and
+      `depends_on: {postgres: {condition: service_healthy}}`?
+    options:
+      - None; the second is just newer syntax
+      - The first waits for the database to accept connections, the second only orders startup
+      - The first only orders startup, the second waits for the healthcheck to pass
+      - The second restarts the database if it is unhealthy
+    answer_index: 2
+    explanation: >
+      Plain `depends_on` orders starting only, so the API launches seconds
+      before Postgres accepts connections, crashes on its first query and
+      restarts. `service_healthy` waits for readiness.
+
+  - id: dock-comp-q4
+    type: multiple_choice
+    concepts: [compose]
+    prompt: >
+      An application you do not maintain ships a compose file that publishes
+      80 and 443, which your central proxy already owns. What is the right fix?
+    options:
+      - Edit its docker-compose.yml and remove the ports
+      - Fork the repository and maintain your own version
+      - Add a docker-compose.override.yml that resets the ports, and keep it out of git
+      - Change the central proxy to use different ports
+    answer_index: 2
+    explanation: >
+      Editing the tracked file means fighting `git pull` forever. Compose
+      merges an override automatically. Note that `ports: []` is not enough —
+      sequences merge additively, so you need `ports: !reset []`.
+
+  - id: dock-comp-q5
+    type: multiple_choice
+    concepts: [compose]
+    prompt: >
+      You changed application code and want to deploy it without interrupting
+      the database. Which command?
+    options:
+      - docker compose down && docker compose up -d
+      - docker compose restart
+      - docker compose up -d --no-deps api
+      - docker compose down -v && docker compose up -d --build
+    answer_index: 2
+    explanation: >
+      `up -d --no-deps api` replaces one service and leaves the rest running.
+      `down` takes the whole stack offline including the database, for what
+      was meant to be a code deploy.

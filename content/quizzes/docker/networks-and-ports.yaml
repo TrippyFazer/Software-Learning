@@ -1,0 +1,81 @@
+id: docker/networks-and-ports
+questions:
+  - id: dock-net-q1
+    type: multiple_choice
+    concepts: [container-network, compose-service]
+    prompt: >
+      Caddy reaches the Task OS API with `reverse_proxy task-os-api:8000`,
+      yet port 8000 is published nowhere. How does that work?
+    options:
+      - Docker publishes port 8000 automatically for internal use
+      - Caddy reads Docker's configuration and finds the process directly
+      - Both containers share a network, and Docker resolves the container name to an address on it
+      - The port is published but only bound to localhost
+    answer_index: 2
+    explanation: >
+      User-defined networks run an embedded DNS resolver. `task-os-api`
+      resolves to that container's address on the shared `proxy` network, and
+      8000 is the port inside the container. No host port exists in that path.
+
+  - id: dock-net-q2
+    type: multiple_choice
+    concepts: [port-publishing]
+    prompt: >
+      On a cloud server with a public IP, what does adding
+      `ports: "5432:5432"` to a database service mean?
+    options:
+      - The database is reachable from other containers only
+      - The database is reachable from the host only
+      - The database is reachable from the public internet
+      - Nothing changes; 5432 is blocked by default
+    answer_index: 2
+    explanation: >
+      Publishing binds the host's port on all interfaces — and the host has a
+      public IP. Bots scan the whole address space continuously, so this is
+      how small projects get compromised.
+
+  - id: dock-net-q3
+    type: multiple_choice
+    concepts: [port-publishing]
+    prompt: >
+      You publish a port, then add a ufw rule denying it. What happens?
+    options:
+      - The port is blocked; ufw is evaluated first
+      - The port stays open; Docker's iptables rules are evaluated before ufw's
+      - Docker refuses to publish the port
+      - Both rules apply, so the port is open to the host but not the network
+    answer_index: 1
+    explanation: >
+      Docker inserts its own iptables rules in a chain evaluated before ufw's.
+      A ufw rule that appears to protect you and does not is worse than none —
+      which is why the cloud firewall is the authoritative perimeter on this
+      server.
+
+  - id: dock-net-q4
+    type: multiple_choice
+    concepts: [container-network]
+    prompt: >
+      From the Task OS API container, you try to resolve
+      `learning-lab-postgres`. What happens, and why?
+    options:
+      - It resolves but the connection is refused by the database
+      - It fails to resolve — that container is on a network Task OS has not joined
+      - It resolves, because all containers share Docker's default DNS
+      - It resolves only if both stacks were started by the same user
+    answer_index: 1
+    explanation: >
+      A container can only resolve names on networks it has joined. The two
+      databases sit on their own private networks, so there is nothing to
+      address — not merely nothing to connect to.
+
+  - id: dock-net-q5
+    type: text
+    concepts: [container-network, compose-service]
+    prompt: >
+      Two of your own containers cannot talk to each other. What should you
+      add — a published port, or a shared network?
+    accept: ["shared network", "a shared network", "network", "shared docker network"]
+    explanation: >
+      A shared network, plus the right service name. Publishing a port to make
+      two of your own containers talk exposes them to the world to solve a
+      naming problem.
